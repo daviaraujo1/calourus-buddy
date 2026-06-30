@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Compass,
   Users,
@@ -10,8 +11,10 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle2,
+  LayoutDashboard,
 } from "lucide-react";
 import heroImg from "@/assets/hero-students.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
