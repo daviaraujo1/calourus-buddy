@@ -270,7 +270,7 @@ function Plans() {
             <div className="p-5 text-sm font-semibold uppercase tracking-wider">Funcionalidade</div>
             <div className="p-5 text-center text-sm font-semibold uppercase tracking-wider">Visitante</div>
             <div className="bg-laranja p-5 text-center text-sm font-semibold uppercase tracking-wider text-marinho">
-              Estudante logado
+              PREMIUM
             </div>
           </div>
           {rows.map(([label, v, l], i) => (
