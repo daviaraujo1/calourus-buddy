@@ -125,12 +125,12 @@ function Hero() {
             monitores dos principais cursos da sua universidade.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href="#cadastro"
+            <Link
+              to="/auth"
               className="inline-flex items-center gap-2 rounded-full bg-laranja px-6 py-3 text-sm font-semibold text-marinho shadow-[var(--shadow-glow)] transition hover:brightness-105"
             >
               Criar conta gratuita <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
             <a
               href="#cursos"
               className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
