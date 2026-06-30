@@ -5,7 +5,7 @@ import {
   Users,
   GraduationCap,
   BookOpen,
-  PlayCircle,
+  Layers,
   FileQuestion,
   UserCheck,
   ArrowRight,
