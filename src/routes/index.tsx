@@ -227,9 +227,9 @@ function Features() {
               Tudo num só lugar, do 1º ao último dia
             </h2>
           </div>
-          <a href="#cadastro" className="text-sm font-semibold text-marinho hover:underline">
+          <Link to="/auth" className="text-sm font-semibold text-marinho hover:underline">
             Ver todos os recursos →
-          </a>
+          </Link>
         </div>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {items.map(({ icon: Icon, title, desc }) => (
