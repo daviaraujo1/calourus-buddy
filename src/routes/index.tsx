@@ -5,7 +5,7 @@ import {
   Users,
   GraduationCap,
   BookOpen,
-  PlayCircle,
+  Layers,
   FileQuestion,
   UserCheck,
   ArrowRight,
@@ -213,9 +213,9 @@ function Pillars() {
 function Features() {
   const items = [
     { icon: BookOpen, title: "Materiais guia", desc: "Resumos curados por ementa, organizados por disciplina e período." },
-    { icon: PlayCircle, title: "Videoaulas", desc: "Aulas curtas que destravam os tópicos mais difíceis do semestre." },
+    { icon: Layers, title: "Flashcards", desc: "Cartões de estudo interativos para memorizar os conceitos-chave do semestre." },
     { icon: FileQuestion, title: "Banco de questões", desc: "Milhares de exercícios resolvidos, filtráveis por curso e nível." },
-    { icon: UserCheck, title: "Monitores", desc: "Veteranos verificados disponíveis para tirar dúvidas em tempo real." },
+    { icon: UserCheck, title: "Monitores", desc: "Veteranos verificados disponíveis para tirar dúvidas em tempo real. (em breve)" },
   ];
   return (
     <section id="cursos" className="border-y border-border bg-secondary/50">
