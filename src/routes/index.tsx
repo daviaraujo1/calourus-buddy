@@ -1,4 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Compass,
   Users,
@@ -10,8 +11,10 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle2,
+  LayoutDashboard,
 } from "lucide-react";
 import heroImg from "@/assets/hero-students.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -43,29 +46,55 @@ function Home() {
   );
 }
 
+function useAuthed() {
+  const [authed, setAuthed] = useState<boolean | null>(null);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setAuthed(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+  return authed;
+}
+
 function Nav() {
+  const authed = useAuthed();
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <a href="#" className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-xl bg-marinho text-primary-foreground font-display font-bold">
             C
           </span>
           <span className="font-display text-lg font-bold text-marinho">Calourus</span>
-        </a>
+        </Link>
         <nav className="hidden gap-8 text-sm font-medium text-muted-foreground md:flex">
           <a href="#como-funciona" className="hover:text-marinho">Como funciona</a>
           <a href="#cursos" className="hover:text-marinho">Cursos</a>
           <a href="#planos" className="hover:text-marinho">Planos</a>
         </nav>
         <div className="flex items-center gap-2">
-          <a href="#login" className="hidden text-sm font-medium text-marinho hover:underline sm:inline">Entrar</a>
-          <a
-            href="#cadastro"
-            className="inline-flex items-center gap-1.5 rounded-full bg-laranja px-4 py-2 text-sm font-semibold text-marinho shadow-[var(--shadow-glow)] transition hover:brightness-105"
-          >
-            Começar grátis <ArrowRight className="h-4 w-4" />
-          </a>
+          {authed ? (
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center gap-1.5 rounded-full bg-laranja px-4 py-2 text-sm font-semibold text-marinho shadow-[var(--shadow-glow)] transition hover:brightness-105"
+            >
+              <LayoutDashboard className="h-4 w-4" /> Meu painel
+            </Link>
+          ) : (
+            <>
+              <Link to="/auth" className="hidden text-sm font-medium text-marinho hover:underline sm:inline">
+                Entrar
+              </Link>
+              <Link
+                to="/auth"
+                className="inline-flex items-center gap-1.5 rounded-full bg-laranja px-4 py-2 text-sm font-semibold text-marinho shadow-[var(--shadow-glow)] transition hover:brightness-105"
+              >
+                Começar grátis <ArrowRight className="h-4 w-4" />
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
@@ -96,12 +125,12 @@ function Hero() {
             monitores dos principais cursos da sua universidade.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <a
-              href="#cadastro"
+            <Link
+              to="/auth"
               className="inline-flex items-center gap-2 rounded-full bg-laranja px-6 py-3 text-sm font-semibold text-marinho shadow-[var(--shadow-glow)] transition hover:brightness-105"
             >
               Criar conta gratuita <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
             <a
               href="#cursos"
               className="inline-flex items-center gap-2 rounded-full border border-white/25 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
@@ -198,9 +227,9 @@ function Features() {
               Tudo num só lugar, do 1º ao último dia
             </h2>
           </div>
-          <a href="#cadastro" className="text-sm font-semibold text-marinho hover:underline">
+          <Link to="/auth" className="text-sm font-semibold text-marinho hover:underline">
             Ver todos os recursos →
-          </a>
+          </Link>
         </div>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {items.map(({ icon: Icon, title, desc }) => (
