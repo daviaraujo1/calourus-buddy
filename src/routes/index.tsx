@@ -270,7 +270,7 @@ function Plans() {
             <div className="p-5 text-sm font-semibold uppercase tracking-wider">Funcionalidade</div>
             <div className="p-5 text-center text-sm font-semibold uppercase tracking-wider">Visitante</div>
             <div className="bg-laranja p-5 text-center text-sm font-semibold uppercase tracking-wider text-marinho">
-              Estudante logado
+              PREMIUM
             </div>
           </div>
           {rows.map(([label, v, l], i) => (
@@ -348,7 +348,7 @@ function Footer() {
           </span>
           <span className="font-display text-lg font-bold">Calourus</span>
         </div>
-        <p className="text-sm text-white/70">© {new Date().getFullYear()} Calourus · calourus.com.br · contato@calourus.com.br</p>
+        <p className="text-sm text-white/70">© 2026 Calourus · calourus.com.br&nbsp;</p>
       </div>
     </footer>
   );
