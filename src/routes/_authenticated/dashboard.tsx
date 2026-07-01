@@ -93,13 +93,33 @@ function Dashboard() {
         <section className="mt-10">
           <h2 className="font-display text-2xl font-bold text-marinho">Acesso rápido</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {cards.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="rounded-2xl bg-card p-6 ring-1 ring-border transition hover:ring-laranja">
-                <Icon className="h-7 w-7 text-laranja" strokeWidth={1.75} />
-                <h3 className="mt-4 font-display text-lg font-bold text-marinho">{title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
-              </div>
-            ))}
+            {cards.map(({ icon: Icon, title, desc, to }) => {
+              const inner = (
+                <>
+                  <Icon className="h-7 w-7 text-laranja" strokeWidth={1.75} />
+                  <h3 className="mt-4 font-display text-lg font-bold text-marinho">{title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
+                  {to && (
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-laranja">
+                      Acessar <ArrowRight className="h-4 w-4" />
+                    </span>
+                  )}
+                </>
+              );
+              return to ? (
+                <Link
+                  key={title}
+                  to={to}
+                  className="group rounded-2xl bg-card p-6 ring-1 ring-border transition hover:ring-laranja hover:shadow-[var(--shadow-elegant)]"
+                >
+                  {inner}
+                </Link>
+              ) : (
+                <div key={title} className="rounded-2xl bg-card p-6 ring-1 ring-border opacity-90">
+                  {inner}
+                </div>
+              );
+            })}
           </div>
         </section>
       </main>
