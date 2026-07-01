@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      flashcard_attempts: {
+        Row: {
+          correct: boolean
+          created_at: string
+          flashcard_id: string
+          id: string
+          user_id: string
+          xp_awarded: number
+        }
+        Insert: {
+          correct: boolean
+          created_at?: string
+          flashcard_id: string
+          id?: string
+          user_id: string
+          xp_awarded?: number
+        }
+        Update: {
+          correct?: boolean
+          created_at?: string
+          flashcard_id?: string
+          id?: string
+          user_id?: string
+          xp_awarded?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcard_attempts_flashcard_id_fkey"
+            columns: ["flashcard_id"]
+            isOneToOne: false
+            referencedRelation: "flashcards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flashcard_topics: {
         Row: {
           created_at: string
@@ -136,17 +171,76 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          cards_studied: number
+          correct_count: number
+          created_at: string
+          last_study_date: string | null
+          level: number
+          streak_days: number
+          updated_at: string
+          user_id: string
+          xp: number
+        }
+        Insert: {
+          cards_studied?: number
+          correct_count?: number
+          created_at?: string
+          last_study_date?: string | null
+          level?: number
+          streak_days?: number
+          updated_at?: string
+          user_id: string
+          xp?: number
+        }
+        Update: {
+          cards_studied?: number
+          correct_count?: number
+          created_at?: string
+          last_study_date?: string | null
+          level?: number
+          streak_days?: number
+          updated_at?: string
+          user_id?: string
+          xp?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      get_leaderboard: {
+        Args: { _limit?: number }
+        Returns: {
+          avatar_url: string
+          cards_studied: number
+          display_name: string
+          level: number
+          streak_days: number
+          user_id: string
+          xp: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      record_flashcard_attempt: {
+        Args: { _correct: boolean; _flashcard_id: string }
+        Returns: {
+          leveled_up: boolean
+          new_level: number
+          old_level: number
+          streak_days: number
+          total_xp: number
+          xp_gained: number
+        }[]
       }
     }
     Enums: {

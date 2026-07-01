@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, ChevronLeft, ChevronRight, RotateCcw, Shuffle } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, RotateCcw, Shuffle, X, Check, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/flashcards/$topicSlug")({
   head: () => ({
@@ -33,6 +34,8 @@ function FlashcardStudy() {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [answered, setAnswered] = useState<Record<string, boolean>>({});
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -60,6 +63,7 @@ function FlashcardStudy() {
   }, [topicSlug]);
 
   const current = cards[index];
+  const alreadyAnswered = current ? !!answered[current.id] : false;
 
   function next() {
     setFlipped(false);
@@ -72,11 +76,40 @@ function FlashcardStudy() {
   function restart() {
     setFlipped(false);
     setIndex(0);
+    setAnswered({});
   }
   function shuffleCards() {
     setFlipped(false);
     setIndex(0);
+    setAnswered({});
     setCards((c) => shuffle(c));
+  }
+
+  async function answer(correct: boolean) {
+    if (!current || submitting || alreadyAnswered) return;
+    setSubmitting(true);
+    const { data, error } = await supabase.rpc("record_flashcard_attempt", {
+      _flashcard_id: current.id,
+      _correct: correct,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Não foi possível registrar sua resposta");
+      return;
+    }
+    const row = Array.isArray(data) ? data[0] : data;
+    setAnswered((a) => ({ ...a, [current.id]: true }));
+    if (row?.leveled_up) {
+      toast.success(`🎉 Subiu para o nível ${row.new_level}! +${row.xp_gained} XP`);
+    } else {
+      toast.success(`${correct ? "Boa!" : "Vamos revisar"} +${row?.xp_gained ?? 0} XP`);
+    }
+    setTimeout(() => {
+      if (index < cards.length - 1) {
+        setFlipped(false);
+        setIndex((i) => i + 1);
+      }
+    }, 700);
   }
 
   return (
@@ -198,28 +231,52 @@ function FlashcardStudy() {
               </div>
             </div>
 
-            <div className="mt-8 flex items-center justify-between gap-3">
-              <button
-                onClick={prev}
-                disabled={index === 0}
-                className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-semibold text-marinho transition hover:bg-secondary disabled:opacity-40"
-              >
-                <ChevronLeft className="h-4 w-4" /> Anterior
-              </button>
-              <button
-                onClick={() => setFlipped((f) => !f)}
-                className="rounded-full bg-marinho px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-marinho-soft"
-              >
-                {flipped ? "Ver pergunta" : "Ver resposta"}
-              </button>
-              <button
-                onClick={next}
-                disabled={index === cards.length - 1}
-                className="inline-flex items-center gap-2 rounded-full bg-laranja px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-40"
-              >
-                Próximo <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+            {flipped && !alreadyAnswered ? (
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                <button
+                  onClick={() => answer(false)}
+                  disabled={submitting}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-marinho/20 bg-white px-6 py-4 font-display font-semibold text-marinho transition hover:border-marinho hover:bg-secondary disabled:opacity-50"
+                >
+                  <X className="h-5 w-5" /> Errei <span className="text-xs font-medium text-muted-foreground">+2 XP</span>
+                </button>
+                <button
+                  onClick={() => answer(true)}
+                  disabled={submitting}
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-laranja px-6 py-4 font-display font-semibold text-primary-foreground shadow-[var(--shadow-elegant)] transition hover:opacity-90 disabled:opacity-50"
+                >
+                  <Check className="h-5 w-5" /> Acertei <span className="text-xs font-medium text-white/80">+10 XP</span>
+                </button>
+              </div>
+            ) : (
+              <div className="mt-8 flex items-center justify-between gap-3">
+                <button
+                  onClick={prev}
+                  disabled={index === 0}
+                  className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-semibold text-marinho transition hover:bg-secondary disabled:opacity-40"
+                >
+                  <ChevronLeft className="h-4 w-4" /> Anterior
+                </button>
+                <button
+                  onClick={() => setFlipped((f) => !f)}
+                  className="rounded-full bg-marinho px-6 py-2.5 text-sm font-semibold text-primary-foreground transition hover:bg-marinho-soft"
+                >
+                  {flipped ? "Ver pergunta" : "Ver resposta"}
+                </button>
+                <button
+                  onClick={next}
+                  disabled={index === cards.length - 1}
+                  className="inline-flex items-center gap-2 rounded-full bg-laranja px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90 disabled:opacity-40"
+                >
+                  Próximo <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+            {alreadyAnswered && (
+              <p className="mt-3 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-laranja" /> Resposta registrada. Avance para o próximo cartão.
+              </p>
+            )}
           </>
         )}
       </main>
