@@ -63,6 +63,7 @@ function FlashcardStudy() {
   }, [topicSlug]);
 
   const current = cards[index];
+  const alreadyAnswered = current ? !!answered[current.id] : false;
 
   function next() {
     setFlipped(false);
@@ -75,11 +76,40 @@ function FlashcardStudy() {
   function restart() {
     setFlipped(false);
     setIndex(0);
+    setAnswered({});
   }
   function shuffleCards() {
     setFlipped(false);
     setIndex(0);
+    setAnswered({});
     setCards((c) => shuffle(c));
+  }
+
+  async function answer(correct: boolean) {
+    if (!current || submitting || alreadyAnswered) return;
+    setSubmitting(true);
+    const { data, error } = await supabase.rpc("record_flashcard_attempt", {
+      _flashcard_id: current.id,
+      _correct: correct,
+    });
+    setSubmitting(false);
+    if (error) {
+      toast.error("Não foi possível registrar sua resposta");
+      return;
+    }
+    const row = Array.isArray(data) ? data[0] : data;
+    setAnswered((a) => ({ ...a, [current.id]: true }));
+    if (row?.leveled_up) {
+      toast.success(`🎉 Subiu para o nível ${row.new_level}! +${row.xp_gained} XP`);
+    } else {
+      toast.success(`${correct ? "Boa!" : "Vamos revisar"} +${row?.xp_gained ?? 0} XP`);
+    }
+    setTimeout(() => {
+      if (index < cards.length - 1) {
+        setFlipped(false);
+        setIndex((i) => i + 1);
+      }
+    }, 700);
   }
 
   return (
