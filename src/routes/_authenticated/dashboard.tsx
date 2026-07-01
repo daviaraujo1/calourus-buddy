@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Layers, FileQuestion, UserCheck, LogOut, Sparkles, ArrowRight } from "lucide-react";
+import { BookOpen, Layers, FileQuestion, UserCheck, LogOut, Sparkles, ArrowRight, Trophy, User, Flame } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 
