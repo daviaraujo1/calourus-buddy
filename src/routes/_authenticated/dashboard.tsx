@@ -145,7 +145,7 @@ function Dashboard() {
 
         <section className="mt-10">
           <h2 className="font-display text-2xl font-bold text-marinho">Acesso rápido</h2>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {cards.map(({ icon: Icon, title, desc, to }) => {
               const inner = (
                 <>
