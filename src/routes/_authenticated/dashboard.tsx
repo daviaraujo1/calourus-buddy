@@ -52,10 +52,10 @@ function Dashboard() {
   const displayName = profile?.full_name || email.split("@")[0] || "estudante";
 
   const cards = [
-    { icon: BookOpen, title: "Materiais guia", desc: "Resumos por ementa e período." },
-    { icon: PlayCircle, title: "Videoaulas", desc: "Aulas curtas que destravam o semestre." },
-    { icon: FileQuestion, title: "Banco de questões", desc: "Milhares de exercícios resolvidos." },
-    { icon: UserCheck, title: "Monitores", desc: "Tire dúvidas em tempo real." },
+    { icon: BookOpen, title: "Materiais guia", desc: "Resumos por ementa e período.", to: undefined },
+    { icon: Layers, title: "Flashcards", desc: "Estude com cartões por tópico.", to: "/flashcards" as const },
+    { icon: FileQuestion, title: "Banco de questões", desc: "Milhares de exercícios resolvidos.", to: undefined },
+    { icon: UserCheck, title: "Monitores", desc: "Tire dúvidas em tempo real (em breve).", to: undefined },
   ];
 
   return (
