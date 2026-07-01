@@ -21,10 +21,19 @@ type Profile = {
   university: string | null;
 };
 
+type Stats = {
+  xp: number;
+  level: number;
+  streak_days: number;
+};
+
+const XP_PER_LEVEL = 100;
+
 function Dashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [email, setEmail] = useState<string>("");
 
   useEffect(() => {
@@ -32,12 +41,12 @@ function Dashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       setEmail(user.email ?? "");
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name, course, university")
-        .eq("id", user.id)
-        .maybeSingle();
-      setProfile(data);
+      const [{ data: p }, { data: s }] = await Promise.all([
+        supabase.from("profiles").select("full_name, course, university").eq("id", user.id).maybeSingle(),
+        supabase.from("user_stats").select("xp, level, streak_days").eq("user_id", user.id).maybeSingle(),
+      ]);
+      setProfile(p);
+      setStats(s ?? { xp: 0, level: 1, streak_days: 0 });
     })();
   }, []);
 
