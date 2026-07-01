@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedFlashcardsIndexRouteImport } from './routes/_authenticated/flashcards.index'
+import { Route as AuthenticatedFlashcardsTopicSlugRouteImport } from './routes/_authenticated/flashcards.$topicSlug'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -40,17 +41,25 @@ const AuthenticatedFlashcardsIndexRoute =
     path: '/flashcards/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFlashcardsTopicSlugRoute =
+  AuthenticatedFlashcardsTopicSlugRouteImport.update({
+    id: '/flashcards/$topicSlug',
+    path: '/flashcards/$topicSlug',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
   '/flashcards/': typeof AuthenticatedFlashcardsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
   '/flashcards': typeof AuthenticatedFlashcardsIndexRoute
 }
 export interface FileRoutesById {
@@ -59,19 +68,26 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
   '/_authenticated/flashcards/': typeof AuthenticatedFlashcardsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/flashcards/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/flashcards/$topicSlug'
+    | '/flashcards/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/flashcards'
+  to: '/' | '/auth' | '/dashboard' | '/flashcards/$topicSlug' | '/flashcards'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/flashcards/$topicSlug'
     | '/_authenticated/flashcards/'
   fileRoutesById: FileRoutesById
 }
@@ -118,16 +134,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFlashcardsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/flashcards/$topicSlug': {
+      id: '/_authenticated/flashcards/$topicSlug'
+      path: '/flashcards/$topicSlug'
+      fullPath: '/flashcards/$topicSlug'
+      preLoaderRoute: typeof AuthenticatedFlashcardsTopicSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedFlashcardsTopicSlugRoute: typeof AuthenticatedFlashcardsTopicSlugRoute
   AuthenticatedFlashcardsIndexRoute: typeof AuthenticatedFlashcardsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedFlashcardsTopicSlugRoute: AuthenticatedFlashcardsTopicSlugRoute,
   AuthenticatedFlashcardsIndexRoute: AuthenticatedFlashcardsIndexRoute,
 }
 
