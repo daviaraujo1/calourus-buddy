@@ -202,5 +202,4 @@ function PlanBadge({ plan }: { plan?: string }) {
   );
 }
 
-// Keep RouterLink import used to satisfy tree-shakers if referenced elsewhere.
-void RouterLink;
+
