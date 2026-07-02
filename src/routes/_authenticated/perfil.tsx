@@ -109,9 +109,12 @@ function Perfil() {
                   </span>
                 </div>
                 <div className="flex-1">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
-                    <Sparkles className="h-3.5 w-3.5" /> Nível {level}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
+                      <Sparkles className="h-3.5 w-3.5" /> Nível {level}
+                    </span>
+                    <PlanBadge plan={profile?.plan} />
+                  </div>
                   <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">{displayName}</h1>
                   <p className="text-sm text-white/70">
                     {profile?.course || profile?.university
