@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Flame, Trophy, Target, BookOpenCheck, Sparkles, Medal } from "lucide-react";
+import { ArrowLeft, Flame, Trophy, Target, BookOpenCheck, Sparkles, Medal, Crown, User as UserIcon } from "lucide-react";
+import { Link as RouterLink } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -22,7 +23,7 @@ type Stats = {
   last_study_date: string | null;
 };
 
-type Profile = { full_name: string | null; course: string | null; university: string | null; avatar_url: string | null };
+type Profile = { full_name: string | null; course: string | null; university: string | null; avatar_url: string | null; plan: string };
 
 const XP_PER_LEVEL = 100;
 
@@ -40,7 +41,7 @@ function Perfil() {
       setEmail(user.email ?? "");
 
       const [{ data: p }, { data: s }, { data: board }] = await Promise.all([
-        supabase.from("profiles").select("full_name, course, university, avatar_url").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("full_name, course, university, avatar_url, plan").eq("id", user.id).maybeSingle(),
         supabase.from("user_stats").select("xp, level, cards_studied, correct_count, streak_days, last_study_date").eq("user_id", user.id).maybeSingle(),
         supabase.rpc("get_leaderboard", { _limit: 200 }),
       ]);
