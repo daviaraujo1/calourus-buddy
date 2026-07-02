@@ -81,9 +81,22 @@ function Perfil() {
           <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm font-medium text-marinho hover:text-laranja">
             <ArrowLeft className="h-4 w-4" /> Voltar ao painel
           </Link>
-          <Link to="/ranking" className="inline-flex items-center gap-2 rounded-full bg-laranja px-4 py-2 text-sm font-semibold text-primary-foreground">
-            <Trophy className="h-4 w-4" /> Ver ranking
-          </Link>
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-widest ${
+                profile?.plan === "premium"
+                  ? "bg-laranja text-marinho"
+                  : "border border-border bg-secondary text-marinho"
+              }`}
+              title={profile?.plan === "premium" ? "Plano Premium ativo" : "Plano gratuito"}
+            >
+              {profile?.plan === "premium" ? <Crown className="h-3.5 w-3.5" /> : <UserIcon className="h-3.5 w-3.5" />}
+              {profile?.plan === "premium" ? "Premium" : "Visitante"}
+            </span>
+            <Link to="/ranking" className="inline-flex items-center gap-2 rounded-full bg-laranja px-4 py-2 text-sm font-semibold text-primary-foreground">
+              <Trophy className="h-4 w-4" /> Ver ranking
+            </Link>
+          </div>
         </div>
       </header>
 
