@@ -1,11 +1,17 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
+import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
-import { ArrowRight, Loader2, Mail, Lock, User } from "lucide-react";
+import { ArrowRight, Loader2, Mail, Lock, User, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
+const authSearchSchema = z.object({
+  plan: z.enum(["free", "premium"]).catch("free"),
+});
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: authSearchSchema,
   head: () => ({
     meta: [
       { title: "Entrar — Calourus" },
@@ -17,17 +23,34 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { plan } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Already-signed-in users go to the dashboard
+  async function destinationAfterAuth() {
+    if (plan !== "premium") return { to: "/dashboard" as const };
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return { to: "/dashboard" as const };
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("plan")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    if (profile?.plan === "premium") return { to: "/dashboard" as const };
+    return { to: "/checkout" as const };
+  }
+
+  // Already-signed-in users skip straight to where they were headed
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const dest = await destinationAfterAuth();
+      navigate({ ...dest, replace: true });
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
 
   async function handleEmail(e: FormEvent) {
@@ -50,7 +73,8 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
       }
-      navigate({ to: "/dashboard", replace: true });
+      const dest = await destinationAfterAuth();
+      navigate({ ...dest, replace: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erro ao autenticar";
       toast.error(msg);
@@ -63,7 +87,7 @@ function AuthPage() {
     setLoading(true);
     try {
       const result = await lovable.auth.signInWithOAuth(provider, {
-        redirect_uri: window.location.origin + "/auth",
+        redirect_uri: window.location.origin + "/auth" + (plan === "premium" ? "?plan=premium" : ""),
       });
       if (result.error) {
         toast.error(result.error.message ?? "Não foi possível entrar");
@@ -71,7 +95,8 @@ function AuthPage() {
       }
       if (result.redirected) return;
       // Tokens already set
-      navigate({ to: "/dashboard", replace: true });
+      const dest = await destinationAfterAuth();
+      navigate({ ...dest, replace: true });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erro no login social";
       toast.error(msg);
@@ -89,6 +114,16 @@ function AuthPage() {
           </span>
           <span className="font-display text-xl font-bold text-marinho">Calourus</span>
         </Link>
+
+        {plan === "premium" && (
+          <div className="mb-4 flex items-center gap-2 rounded-xl border border-laranja/40 bg-laranja-soft px-4 py-3 text-sm text-marinho">
+            <Sparkles className="h-4 w-4 shrink-0 text-laranja" />
+            <span>
+              Você escolheu o <strong>plano Premium (R$ 39,99/mês)</strong>. Após entrar, você
+              finaliza o pagamento e libera o acesso completo.
+            </span>
+          </div>
+        )}
 
         <div className="rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-elegant)]">
           <h1 className="font-display text-2xl font-bold text-marinho">

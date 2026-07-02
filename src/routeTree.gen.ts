@@ -15,8 +15,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRankingRouteImport } from './routes/_authenticated/ranking'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
+import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
 import { Route as AuthenticatedFlashcardsIndexRouteImport } from './routes/_authenticated/flashcards.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as ApiWebhooksKiwifyRouteImport } from './routes/api/webhooks/kiwify'
 import { Route as AuthenticatedFlashcardsTopicSlugRouteImport } from './routes/_authenticated/flashcards.$topicSlug'
+import { Route as AuthenticatedAdminFlashcardsRouteImport } from './routes/_authenticated/admin/flashcards'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -47,35 +52,70 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCheckoutRoute = AuthenticatedCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFlashcardsIndexRoute =
   AuthenticatedFlashcardsIndexRouteImport.update({
     id: '/flashcards/',
     path: '/flashcards/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRouteRoute,
+} as any)
+const ApiWebhooksKiwifyRoute = ApiWebhooksKiwifyRouteImport.update({
+  id: '/api/webhooks/kiwify',
+  path: '/api/webhooks/kiwify',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedFlashcardsTopicSlugRoute =
   AuthenticatedFlashcardsTopicSlugRouteImport.update({
     id: '/flashcards/$topicSlug',
     path: '/flashcards/$topicSlug',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminFlashcardsRoute =
+  AuthenticatedAdminFlashcardsRouteImport.update({
+    id: '/flashcards',
+    path: '/flashcards',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/ranking': typeof AuthenticatedRankingRoute
+  '/admin/flashcards': typeof AuthenticatedAdminFlashcardsRoute
   '/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
+  '/api/webhooks/kiwify': typeof ApiWebhooksKiwifyRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/flashcards/': typeof AuthenticatedFlashcardsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/checkout': typeof AuthenticatedCheckoutRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/ranking': typeof AuthenticatedRankingRoute
+  '/admin/flashcards': typeof AuthenticatedAdminFlashcardsRoute
   '/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
+  '/api/webhooks/kiwify': typeof ApiWebhooksKiwifyRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/flashcards': typeof AuthenticatedFlashcardsIndexRoute
 }
 export interface FileRoutesById {
@@ -83,10 +123,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteRouteWithChildren
+  '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/ranking': typeof AuthenticatedRankingRoute
+  '/_authenticated/admin/flashcards': typeof AuthenticatedAdminFlashcardsRoute
   '/_authenticated/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
+  '/api/webhooks/kiwify': typeof ApiWebhooksKiwifyRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/flashcards/': typeof AuthenticatedFlashcardsIndexRoute
 }
 export interface FileRouteTypes {
@@ -94,29 +139,43 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/admin'
+    | '/checkout'
     | '/dashboard'
     | '/perfil'
     | '/ranking'
+    | '/admin/flashcards'
     | '/flashcards/$topicSlug'
+    | '/api/webhooks/kiwify'
+    | '/admin/'
     | '/flashcards/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/checkout'
     | '/dashboard'
     | '/perfil'
     | '/ranking'
+    | '/admin/flashcards'
     | '/flashcards/$topicSlug'
+    | '/api/webhooks/kiwify'
+    | '/admin'
     | '/flashcards'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/_authenticated/admin'
+    | '/_authenticated/checkout'
     | '/_authenticated/dashboard'
     | '/_authenticated/perfil'
     | '/_authenticated/ranking'
+    | '/_authenticated/admin/flashcards'
     | '/_authenticated/flashcards/$topicSlug'
+    | '/api/webhooks/kiwify'
+    | '/_authenticated/admin/'
     | '/_authenticated/flashcards/'
   fileRoutesById: FileRoutesById
 }
@@ -124,6 +183,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ApiWebhooksKiwifyRoute: typeof ApiWebhooksKiwifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -170,12 +230,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/checkout': {
+      id: '/_authenticated/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof AuthenticatedCheckoutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/flashcards/': {
       id: '/_authenticated/flashcards/'
       path: '/flashcards'
       fullPath: '/flashcards/'
       preLoaderRoute: typeof AuthenticatedFlashcardsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
+    '/api/webhooks/kiwify': {
+      id: '/api/webhooks/kiwify'
+      path: '/api/webhooks/kiwify'
+      fullPath: '/api/webhooks/kiwify'
+      preLoaderRoute: typeof ApiWebhooksKiwifyRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/flashcards/$topicSlug': {
       id: '/_authenticated/flashcards/$topicSlug'
@@ -184,10 +272,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFlashcardsTopicSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/flashcards': {
+      id: '/_authenticated/admin/flashcards'
+      path: '/flashcards'
+      fullPath: '/admin/flashcards'
+      preLoaderRoute: typeof AuthenticatedAdminFlashcardsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteRouteChildren {
+  AuthenticatedAdminFlashcardsRoute: typeof AuthenticatedAdminFlashcardsRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
+  {
+    AuthenticatedAdminFlashcardsRoute: AuthenticatedAdminFlashcardsRoute,
+    AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  }
+
+const AuthenticatedAdminRouteRouteWithChildren =
+  AuthenticatedAdminRouteRoute._addFileChildren(
+    AuthenticatedAdminRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRouteRoute: typeof AuthenticatedAdminRouteRouteWithChildren
+  AuthenticatedCheckoutRoute: typeof AuthenticatedCheckoutRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedRankingRoute: typeof AuthenticatedRankingRoute
@@ -196,6 +309,8 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRouteRoute: AuthenticatedAdminRouteRouteWithChildren,
+  AuthenticatedCheckoutRoute: AuthenticatedCheckoutRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedRankingRoute: AuthenticatedRankingRoute,
@@ -210,7 +325,18 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ApiWebhooksKiwifyRoute: ApiWebhooksKiwifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

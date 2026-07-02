@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, ChevronLeft, ChevronRight, RotateCcw, Shuffle, X, Check, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { PremiumGate } from "@/components/premium-gate";
 
 export const Route = createFileRoute("/_authenticated/flashcards/$topicSlug")({
   head: () => ({
@@ -113,6 +114,7 @@ function FlashcardStudy() {
   }
 
   return (
+    <PremiumGate>
     <div className="min-h-screen bg-secondary/30">
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-6">
@@ -281,5 +283,6 @@ function FlashcardStudy() {
         )}
       </main>
     </div>
+    </PremiumGate>
   );
 }

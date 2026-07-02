@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import heroImg from "@/assets/hero-students.jpg";
 import { supabase } from "@/integrations/supabase/client";
+import { buildKiwifyCheckoutUrl } from "@/lib/kiwify";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -274,15 +275,19 @@ function Stats() {
 }
 
 function Plans() {
-  const rows = [
-    ["Explicação geral dos cursos", true, true],
-    ["Guia \"Como Funciona\"", true, true],
-    ["Banco de questões básico", true, true],
-    ["Fóruns de discussão", "Leitura", "Interação total"],
-    ["Videoaulas completas", false, true],
-    ["Mentorias e grupos", false, true],
-    ["Monitores 1:1", false, true],
-  ] as const;
+  const freeFeatures = [
+    "5 questões por dia no banco de questões",
+    "Materiais guia e explicação geral dos cursos",
+    "Guia \"Como Funciona\"",
+    "Fóruns de discussão (leitura)",
+  ];
+  const premiumFeatures = [
+    "Questões ilimitadas no banco de questões",
+    "Flashcards ilimitados",
+    "Materiais guia ilimitados",
+    "Videoaulas completas e mentorias",
+    "Fóruns com interação total",
+  ];
 
   return (
     <section id="planos" className="border-y border-border bg-secondary/40">
@@ -294,34 +299,68 @@ function Plans() {
           </h2>
         </div>
 
-        <div className="mt-12 overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elegant)]">
-          <div className="grid grid-cols-3 border-b border-border bg-marinho text-primary-foreground">
-            <div className="p-5 text-sm font-semibold uppercase tracking-wider">Funcionalidade</div>
-            <div className="p-5 text-center text-sm font-semibold uppercase tracking-wider">Visitante</div>
-            <div className="bg-laranja p-5 text-center text-sm font-semibold uppercase tracking-wider text-marinho">
-              PREMIUM
+        <div className="mt-12 grid gap-6 md:grid-cols-2">
+          <div className="flex flex-col rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-elegant)]">
+            <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Padrão</p>
+            <div className="mt-3 flex items-baseline gap-1">
+              <span className="font-display text-4xl font-bold text-marinho">Grátis</span>
             </div>
-          </div>
-          {rows.map(([label, v, l], i) => (
-            <div
-              key={label}
-              className={`grid grid-cols-3 items-center text-sm ${i % 2 ? "bg-secondary/50" : ""}`}
+            <p className="mt-1 text-sm text-muted-foreground">Para conhecer a plataforma, sem custo.</p>
+            <ul className="mt-6 flex flex-1 flex-col gap-3">
+              {freeFeatures.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm text-marinho">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-teal" /> {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              to="/auth"
+              search={{ plan: "free" }}
+              className="mt-8 inline-flex items-center justify-center gap-2 rounded-full border border-border px-6 py-3 text-sm font-semibold text-marinho transition hover:bg-secondary"
             >
-              <div className="p-5 font-medium text-marinho">{label}</div>
-              <div className="p-5 text-center text-muted-foreground">{cell(v)}</div>
-              <div className="p-5 text-center font-semibold text-marinho">{cell(l)}</div>
+              Começar grátis <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="relative flex flex-col rounded-2xl border-2 border-laranja bg-card p-8 shadow-[var(--shadow-elegant)]">
+            <span className="absolute -top-3 right-8 rounded-full bg-laranja px-3 py-1 text-xs font-semibold uppercase tracking-wider text-marinho">
+              Recomendado
+            </span>
+            <p className="text-sm font-semibold uppercase tracking-wider text-laranja">Premium</p>
+            <div className="mt-3 flex items-baseline gap-1">
+              <span className="font-display text-4xl font-bold text-marinho">R$ 39,99</span>
+              <span className="text-sm text-muted-foreground">/mês</span>
             </div>
-          ))}
+            <p className="mt-1 text-sm text-muted-foreground">Acesso completo, sem limites, cancele quando quiser.</p>
+            <ul className="mt-6 flex flex-1 flex-col gap-3">
+              {premiumFeatures.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm font-medium text-marinho">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-laranja" /> {f}
+                </li>
+              ))}
+            </ul>
+            <a
+              href={buildKiwifyCheckoutUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-8 inline-flex items-center justify-center gap-2 rounded-full bg-laranja px-6 py-3 text-sm font-semibold text-marinho shadow-[var(--shadow-glow)] transition hover:brightness-105"
+            >
+              Comprar agora <ArrowRight className="h-4 w-4" />
+            </a>
+            <p className="mt-3 text-center text-xs text-muted-foreground">
+              Abre em uma nova aba, no checkout seguro da Kiwify.{" "}
+              <Link to="/auth" search={{ plan: "premium" }} className="font-medium text-marinho hover:underline">
+                Já tem conta? Entrar
+              </Link>
+            </p>
+          </div>
         </div>
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Preços em reais (BRL). O plano Premium é cobrado mensalmente e pode ser cancelado a qualquer momento.
+        </p>
       </div>
     </section>
   );
-}
-
-function cell(v: boolean | string) {
-  if (v === true) return <CheckCircle2 className="mx-auto h-5 w-5 text-teal" />;
-  if (v === false) return <span className="text-muted-foreground/60">—</span>;
-  return v;
 }
 
 function Testimonial() {
@@ -356,12 +395,13 @@ function CTA() {
           Cadastre-se em menos de 1 minuto e desbloqueie materiais, videoaulas e
           monitores do seu curso.
         </p>
-        <a
-          href="#"
+        <Link
+          to="/auth"
+          search={{ plan: "free" }}
           className="mt-8 inline-flex items-center gap-2 rounded-full bg-marinho px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-marinho-soft"
         >
           Criar minha conta <ArrowRight className="h-4 w-4" />
-        </a>
+        </Link>
       </div>
     </section>
   );

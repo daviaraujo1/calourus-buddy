@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowLeft, ArrowRight, Layers } from "lucide-react";
+import { PremiumGate } from "@/components/premium-gate";
 
 export const Route = createFileRoute("/_authenticated/flashcards/")({
   head: () => ({
@@ -49,6 +50,7 @@ function FlashcardTopics() {
   }, []);
 
   return (
+    <PremiumGate>
     <div className="min-h-screen bg-secondary/30">
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -102,5 +104,6 @@ function FlashcardTopics() {
         </section>
       </main>
     </div>
+    </PremiumGate>
   );
 }

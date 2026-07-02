@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Layers, FileQuestion, UserCheck, LogOut, Sparkles, ArrowRight, Trophy, User, Flame } from "lucide-react";
+import { BookOpen, Layers, FileQuestion, UserCheck, LogOut, Sparkles, ArrowRight, Trophy, User, Flame, Crown, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -19,6 +20,7 @@ type Profile = {
   full_name: string | null;
   course: string | null;
   university: string | null;
+  plan: string;
 };
 
 type Stats = {
@@ -42,7 +44,7 @@ function Dashboard() {
       if (!user) return;
       setEmail(user.email ?? "");
       const [{ data: p }, { data: s }] = await Promise.all([
-        supabase.from("profiles").select("full_name, course, university").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("full_name, course, university, plan").eq("id", user.id).maybeSingle(),
         supabase.from("user_stats").select("xp, level, streak_days").eq("user_id", user.id).maybeSingle(),
       ]);
       setProfile(p);
@@ -59,14 +61,21 @@ function Dashboard() {
   }
 
   const displayName = profile?.full_name || email.split("@")[0] || "estudante";
+  const isPremium = profile?.plan === "premium";
 
   const cards = [
-    { icon: User, title: "Meu perfil", desc: "XP, nível e conquistas.", to: "/perfil" as const },
-    { icon: Trophy, title: "Ranking", desc: "Compare-se com outros alunos.", to: "/ranking" as const },
-    { icon: Layers, title: "Flashcards", desc: "Estude e ganhe XP.", to: "/flashcards" as const },
-    { icon: BookOpen, title: "Materiais guia", desc: "Resumos por ementa e período.", to: undefined },
-    { icon: FileQuestion, title: "Banco de questões", desc: "Milhares de exercícios resolvidos.", to: undefined },
-    { icon: UserCheck, title: "Monitores", desc: "Tire dúvidas em tempo real (em breve).", to: undefined },
+    { icon: User, title: "Meu perfil", desc: "XP, nível e conquistas.", to: "/perfil" as const, locked: false },
+    { icon: Trophy, title: "Ranking", desc: "Compare-se com outros alunos.", to: "/ranking" as const, locked: false },
+    {
+      icon: Layers,
+      title: "Flashcards",
+      desc: isPremium ? "Estude e ganhe XP." : "Desbloqueie com o plano Premium.",
+      to: "/flashcards" as const,
+      locked: !isPremium,
+    },
+    { icon: BookOpen, title: "Materiais guia", desc: "Resumos por ementa e período.", to: undefined, locked: false },
+    { icon: FileQuestion, title: "Banco de questões", desc: isPremium ? "Questões ilimitadas." : "5 questões grátis por dia · ilimitado no Premium.", to: undefined, locked: false },
+    { icon: UserCheck, title: "Monitores", desc: "Tire dúvidas em tempo real (em breve).", to: undefined, locked: false },
   ];
 
   const xp = stats?.xp ?? 0;
@@ -103,9 +112,20 @@ function Dashboard() {
         <div className="rounded-3xl bg-gradient-to-br from-marinho to-marinho-soft p-10 text-primary-foreground shadow-[var(--shadow-elegant)]">
           <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
-                <Sparkles className="h-3.5 w-3.5" /> Painel do estudante
-              </span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
+                  <Sparkles className="h-3.5 w-3.5" /> Painel do estudante
+                </span>
+                {profile && (
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
+                      isPremium ? "bg-laranja text-marinho" : "bg-white/10 text-white"
+                    }`}
+                  >
+                    <Crown className="h-3.5 w-3.5" /> {isPremium ? "Premium" : "Plano padrão"}
+                  </span>
+                )}
+              </div>
               <h1 className="mt-4 font-display text-4xl font-bold sm:text-5xl">
                 Olá, <span className="text-laranja">{displayName}</span>!
               </h1>
@@ -114,6 +134,14 @@ function Dashboard() {
                   ? `${profile.course ?? ""}${profile.course && profile.university ? " · " : ""}${profile.university ?? ""}`
                   : "Complete seu perfil para receber conteúdos personalizados do seu curso."}
               </p>
+              {!isPremium && profile && (
+                <Link
+                  to="/checkout"
+                  className="mt-4 inline-flex items-center gap-2 rounded-full bg-laranja px-5 py-2.5 text-sm font-semibold text-marinho shadow-[var(--shadow-glow)] transition hover:brightness-105"
+                >
+                  Assinar Premium · R$ 39,99/mês
+                </Link>
+              )}
             </div>
             <Link
               to="/perfil"
@@ -146,13 +174,20 @@ function Dashboard() {
         <section className="mt-10">
           <h2 className="font-display text-2xl font-bold text-marinho">Acesso rápido</h2>
           <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {cards.map(({ icon: Icon, title, desc, to }) => {
+            {cards.map(({ icon: Icon, title, desc, to, locked }) => {
               const inner = (
                 <>
-                  <Icon className="h-7 w-7 text-laranja" strokeWidth={1.75} />
+                  <div className="flex items-center justify-between">
+                    <Icon className="h-7 w-7 text-laranja" strokeWidth={1.75} />
+                    {locked && (
+                      <Badge variant="outline" className="gap-1 border-laranja/40 bg-laranja-soft text-marinho">
+                        <Lock className="h-3 w-3" /> Premium
+                      </Badge>
+                    )}
+                  </div>
                   <h3 className="mt-4 font-display text-lg font-bold text-marinho">{title}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
-                  {to && (
+                  {to && !locked && (
                     <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-laranja">
                       Acessar <ArrowRight className="h-4 w-4" />
                     </span>
