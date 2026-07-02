@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, redirect, useLocation, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { LogOut, ArrowLeft, Users, Layers } from "lucide-react";
+import { LogOut, ArrowLeft, Users, Layers, FileQuestion } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
 const TABS = [
   { to: "/admin", label: "Usuários", icon: Users },
   { to: "/admin/flashcards", label: "Flashcards", icon: Layers },
+  { to: "/admin/questions", label: "Questões", icon: FileQuestion },
 ] as const;
 
 function AdminLayout() {

@@ -74,7 +74,7 @@ function Dashboard() {
       locked: !isPremium,
     },
     { icon: BookOpen, title: "Materiais guia", desc: "Resumos por ementa e período.", to: undefined, locked: false },
-    { icon: FileQuestion, title: "Banco de questões", desc: isPremium ? "Questões ilimitadas." : "5 questões grátis por dia · ilimitado no Premium.", to: undefined, locked: false },
+    { icon: FileQuestion, title: "Banco de questões", desc: isPremium ? "Questões ilimitadas." : "5 questões grátis por dia · ilimitado no Premium.", to: "/questoes" as const, locked: false },
     { icon: UserCheck, title: "Monitores", desc: "Tire dúvidas em tempo real (em breve).", to: undefined, locked: false },
   ];
 

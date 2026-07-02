@@ -14,6 +14,118 @@ export type Database = {
   }
   public: {
     Tables: {
+      question_topics: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          correct_option: number | null
+          created_at: string
+          explanation: string | null
+          id: string
+          options: Json | null
+          prompt: string
+          sort_order: number
+          topic_id: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          correct_option?: number | null
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json | null
+          prompt: string
+          sort_order?: number
+          topic_id: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          correct_option?: number | null
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json | null
+          prompt?: string
+          sort_order?: number
+          topic_id?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "question_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_attempts: {
+        Row: {
+          answer: string | null
+          correct: boolean | null
+          created_at: string
+          id: string
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          correct?: boolean | null
+          created_at?: string
+          id?: string
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          correct?: boolean | null
+          created_at?: string
+          id?: string
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_attempts_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flashcard_attempts: {
         Row: {
           correct: boolean
@@ -218,6 +330,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_daily_question_usage: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          answered_today: number
+          is_premium: boolean
+          remaining: number
+        }[]
+      }
       get_leaderboard: {
         Args: { _limit?: number }
         Returns: {
@@ -238,6 +358,27 @@ export type Database = {
         }
         Returns: boolean
       }
+      list_question_topics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          description: string
+          id: string
+          question_count: number
+          slug: string
+          sort_order: number
+          title: string
+        }[]
+      }
+      list_topic_questions: {
+        Args: { _topic_id: string }
+        Returns: {
+          id: string
+          options: Json
+          prompt: string
+          sort_order: number
+          type: string
+        }[]
+      }
       record_flashcard_attempt: {
         Args: { _correct: boolean; _flashcard_id: string }
         Returns: {
@@ -247,6 +388,16 @@ export type Database = {
           streak_days: number
           total_xp: number
           xp_gained: number
+        }[]
+      }
+      record_question_attempt: {
+        Args: { _answer: string; _question_id: string }
+        Returns: {
+          correct: boolean
+          correct_option: number
+          explanation: string
+          is_premium: boolean
+          remaining_today: number
         }[]
       }
     }

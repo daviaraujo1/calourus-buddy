@@ -17,10 +17,13 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedAdminRouteRouteImport } from './routes/_authenticated/admin/route'
+import { Route as AuthenticatedQuestoesIndexRouteImport } from './routes/_authenticated/questoes.index'
 import { Route as AuthenticatedFlashcardsIndexRouteImport } from './routes/_authenticated/flashcards.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiWebhooksKiwifyRouteImport } from './routes/api/webhooks/kiwify'
+import { Route as AuthenticatedQuestoesTopicSlugRouteImport } from './routes/_authenticated/questoes.$topicSlug'
 import { Route as AuthenticatedFlashcardsTopicSlugRouteImport } from './routes/_authenticated/flashcards.$topicSlug'
+import { Route as AuthenticatedAdminQuestionsRouteImport } from './routes/_authenticated/admin/questions'
 import { Route as AuthenticatedAdminFlashcardsRouteImport } from './routes/_authenticated/admin/flashcards'
 
 const AuthRoute = AuthRouteImport.update({
@@ -62,6 +65,12 @@ const AuthenticatedAdminRouteRoute = AuthenticatedAdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedQuestoesIndexRoute =
+  AuthenticatedQuestoesIndexRouteImport.update({
+    id: '/questoes/',
+    path: '/questoes/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFlashcardsIndexRoute =
   AuthenticatedFlashcardsIndexRouteImport.update({
     id: '/flashcards/',
@@ -78,11 +87,23 @@ const ApiWebhooksKiwifyRoute = ApiWebhooksKiwifyRouteImport.update({
   path: '/api/webhooks/kiwify',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedQuestoesTopicSlugRoute =
+  AuthenticatedQuestoesTopicSlugRouteImport.update({
+    id: '/questoes/$topicSlug',
+    path: '/questoes/$topicSlug',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFlashcardsTopicSlugRoute =
   AuthenticatedFlashcardsTopicSlugRouteImport.update({
     id: '/flashcards/$topicSlug',
     path: '/flashcards/$topicSlug',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAdminQuestionsRoute =
+  AuthenticatedAdminQuestionsRouteImport.update({
+    id: '/questions',
+    path: '/questions',
+    getParentRoute: () => AuthenticatedAdminRouteRoute,
   } as any)
 const AuthenticatedAdminFlashcardsRoute =
   AuthenticatedAdminFlashcardsRouteImport.update({
@@ -100,10 +121,13 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/ranking': typeof AuthenticatedRankingRoute
   '/admin/flashcards': typeof AuthenticatedAdminFlashcardsRoute
+  '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
   '/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
+  '/questoes/$topicSlug': typeof AuthenticatedQuestoesTopicSlugRoute
   '/api/webhooks/kiwify': typeof ApiWebhooksKiwifyRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/flashcards/': typeof AuthenticatedFlashcardsIndexRoute
+  '/questoes/': typeof AuthenticatedQuestoesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -113,10 +137,13 @@ export interface FileRoutesByTo {
   '/perfil': typeof AuthenticatedPerfilRoute
   '/ranking': typeof AuthenticatedRankingRoute
   '/admin/flashcards': typeof AuthenticatedAdminFlashcardsRoute
+  '/admin/questions': typeof AuthenticatedAdminQuestionsRoute
   '/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
+  '/questoes/$topicSlug': typeof AuthenticatedQuestoesTopicSlugRoute
   '/api/webhooks/kiwify': typeof ApiWebhooksKiwifyRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/flashcards': typeof AuthenticatedFlashcardsIndexRoute
+  '/questoes': typeof AuthenticatedQuestoesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,10 +156,13 @@ export interface FileRoutesById {
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/ranking': typeof AuthenticatedRankingRoute
   '/_authenticated/admin/flashcards': typeof AuthenticatedAdminFlashcardsRoute
+  '/_authenticated/admin/questions': typeof AuthenticatedAdminQuestionsRoute
   '/_authenticated/flashcards/$topicSlug': typeof AuthenticatedFlashcardsTopicSlugRoute
+  '/_authenticated/questoes/$topicSlug': typeof AuthenticatedQuestoesTopicSlugRoute
   '/api/webhooks/kiwify': typeof ApiWebhooksKiwifyRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/flashcards/': typeof AuthenticatedFlashcardsIndexRoute
+  '/_authenticated/questoes/': typeof AuthenticatedQuestoesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,10 +175,13 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/ranking'
     | '/admin/flashcards'
+    | '/admin/questions'
     | '/flashcards/$topicSlug'
+    | '/questoes/$topicSlug'
     | '/api/webhooks/kiwify'
     | '/admin/'
     | '/flashcards/'
+    | '/questoes/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -158,10 +191,13 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/ranking'
     | '/admin/flashcards'
+    | '/admin/questions'
     | '/flashcards/$topicSlug'
+    | '/questoes/$topicSlug'
     | '/api/webhooks/kiwify'
     | '/admin'
     | '/flashcards'
+    | '/questoes'
   id:
     | '__root__'
     | '/'
@@ -173,10 +209,13 @@ export interface FileRouteTypes {
     | '/_authenticated/perfil'
     | '/_authenticated/ranking'
     | '/_authenticated/admin/flashcards'
+    | '/_authenticated/admin/questions'
     | '/_authenticated/flashcards/$topicSlug'
+    | '/_authenticated/questoes/$topicSlug'
     | '/api/webhooks/kiwify'
     | '/_authenticated/admin/'
     | '/_authenticated/flashcards/'
+    | '/_authenticated/questoes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -244,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/questoes/': {
+      id: '/_authenticated/questoes/'
+      path: '/questoes'
+      fullPath: '/questoes/'
+      preLoaderRoute: typeof AuthenticatedQuestoesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/flashcards/': {
       id: '/_authenticated/flashcards/'
       path: '/flashcards'
@@ -265,12 +311,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhooksKiwifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/questoes/$topicSlug': {
+      id: '/_authenticated/questoes/$topicSlug'
+      path: '/questoes/$topicSlug'
+      fullPath: '/questoes/$topicSlug'
+      preLoaderRoute: typeof AuthenticatedQuestoesTopicSlugRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/flashcards/$topicSlug': {
       id: '/_authenticated/flashcards/$topicSlug'
       path: '/flashcards/$topicSlug'
       fullPath: '/flashcards/$topicSlug'
       preLoaderRoute: typeof AuthenticatedFlashcardsTopicSlugRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/questions': {
+      id: '/_authenticated/admin/questions'
+      path: '/questions'
+      fullPath: '/admin/questions'
+      preLoaderRoute: typeof AuthenticatedAdminQuestionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRouteRoute
     }
     '/_authenticated/admin/flashcards': {
       id: '/_authenticated/admin/flashcards'
@@ -284,12 +344,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteRouteChildren {
   AuthenticatedAdminFlashcardsRoute: typeof AuthenticatedAdminFlashcardsRoute
+  AuthenticatedAdminQuestionsRoute: typeof AuthenticatedAdminQuestionsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
 const AuthenticatedAdminRouteRouteChildren: AuthenticatedAdminRouteRouteChildren =
   {
     AuthenticatedAdminFlashcardsRoute: AuthenticatedAdminFlashcardsRoute,
+    AuthenticatedAdminQuestionsRoute: AuthenticatedAdminQuestionsRoute,
     AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   }
 
@@ -305,7 +367,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedRankingRoute: typeof AuthenticatedRankingRoute
   AuthenticatedFlashcardsTopicSlugRoute: typeof AuthenticatedFlashcardsTopicSlugRoute
+  AuthenticatedQuestoesTopicSlugRoute: typeof AuthenticatedQuestoesTopicSlugRoute
   AuthenticatedFlashcardsIndexRoute: typeof AuthenticatedFlashcardsIndexRoute
+  AuthenticatedQuestoesIndexRoute: typeof AuthenticatedQuestoesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -315,7 +379,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedRankingRoute: AuthenticatedRankingRoute,
   AuthenticatedFlashcardsTopicSlugRoute: AuthenticatedFlashcardsTopicSlugRoute,
+  AuthenticatedQuestoesTopicSlugRoute: AuthenticatedQuestoesTopicSlugRoute,
   AuthenticatedFlashcardsIndexRoute: AuthenticatedFlashcardsIndexRoute,
+  AuthenticatedQuestoesIndexRoute: AuthenticatedQuestoesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -330,3 +396,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
