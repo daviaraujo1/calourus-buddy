@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Flame, Trophy, Target, BookOpenCheck, Sparkles, Medal } from "lucide-react";
+import { ArrowLeft, Flame, Trophy, Target, BookOpenCheck, Sparkles, Medal, Crown, User as UserIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -22,7 +22,7 @@ type Stats = {
   last_study_date: string | null;
 };
 
-type Profile = { full_name: string | null; course: string | null; university: string | null; avatar_url: string | null };
+type Profile = { full_name: string | null; course: string | null; university: string | null; avatar_url: string | null; plan: string };
 
 const XP_PER_LEVEL = 100;
 
@@ -40,7 +40,7 @@ function Perfil() {
       setEmail(user.email ?? "");
 
       const [{ data: p }, { data: s }, { data: board }] = await Promise.all([
-        supabase.from("profiles").select("full_name, course, university, avatar_url").eq("id", user.id).maybeSingle(),
+        supabase.from("profiles").select("full_name, course, university, avatar_url, plan").eq("id", user.id).maybeSingle(),
         supabase.from("user_stats").select("xp, level, cards_studied, correct_count, streak_days, last_study_date").eq("user_id", user.id).maybeSingle(),
         supabase.rpc("get_leaderboard", { _limit: 200 }),
       ]);
@@ -81,9 +81,22 @@ function Perfil() {
           <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm font-medium text-marinho hover:text-laranja">
             <ArrowLeft className="h-4 w-4" /> Voltar ao painel
           </Link>
-          <Link to="/ranking" className="inline-flex items-center gap-2 rounded-full bg-laranja px-4 py-2 text-sm font-semibold text-primary-foreground">
-            <Trophy className="h-4 w-4" /> Ver ranking
-          </Link>
+          <div className="flex items-center gap-2">
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-widest ${
+                profile?.plan === "premium"
+                  ? "bg-laranja text-marinho"
+                  : "border border-border bg-secondary text-marinho"
+              }`}
+              title={profile?.plan === "premium" ? "Plano Premium ativo" : "Plano gratuito"}
+            >
+              {profile?.plan === "premium" ? <Crown className="h-3.5 w-3.5" /> : <UserIcon className="h-3.5 w-3.5" />}
+              {profile?.plan === "premium" ? "Premium" : "Visitante"}
+            </span>
+            <Link to="/ranking" className="inline-flex items-center gap-2 rounded-full bg-laranja px-4 py-2 text-sm font-semibold text-primary-foreground">
+              <Trophy className="h-4 w-4" /> Ver ranking
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -108,9 +121,12 @@ function Perfil() {
                   </span>
                 </div>
                 <div className="flex-1">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
-                    <Sparkles className="h-3.5 w-3.5" /> Nível {level}
-                  </span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
+                      <Sparkles className="h-3.5 w-3.5" /> Nível {level}
+                    </span>
+                    <PlanBadge plan={profile?.plan} />
+                  </div>
                   <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">{displayName}</h1>
                   <p className="text-sm text-white/70">
                     {profile?.course || profile?.university
@@ -183,3 +199,20 @@ function Perfil() {
     </div>
   );
 }
+
+function PlanBadge({ plan }: { plan?: string }) {
+  const isPremium = plan === "premium";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
+        isPremium ? "bg-laranja text-marinho" : "bg-white/10 text-white"
+      }`}
+      title={isPremium ? "Plano Premium ativo" : "Plano gratuito (visitante)"}
+    >
+      {isPremium ? <Crown className="h-3.5 w-3.5" /> : <UserIcon className="h-3.5 w-3.5" />}
+      {isPremium ? "Premium" : "Visitante"}
+    </span>
+  );
+}
+
+

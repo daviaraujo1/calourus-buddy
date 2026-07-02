@@ -122,8 +122,10 @@ export type Database = {
           avatar_url: string | null
           course: string | null
           created_at: string
+          email: string | null
           full_name: string | null
           id: string
+          plan: string
           semester: string | null
           university: string | null
           updated_at: string
@@ -132,8 +134,10 @@ export type Database = {
           avatar_url?: string | null
           course?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id: string
+          plan?: string
           semester?: string | null
           university?: string | null
           updated_at?: string
@@ -142,8 +146,10 @@ export type Database = {
           avatar_url?: string | null
           course?: string | null
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
+          plan?: string
           semester?: string | null
           university?: string | null
           updated_at?: string
@@ -224,6 +230,7 @@ export type Database = {
           xp: number
         }[]
       }
+      grant_premium_by_email: { Args: { p_email: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
