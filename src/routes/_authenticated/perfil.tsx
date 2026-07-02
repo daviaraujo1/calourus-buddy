@@ -187,3 +187,21 @@ function Perfil() {
     </div>
   );
 }
+
+function PlanBadge({ plan }: { plan?: string }) {
+  const isPremium = plan === "premium";
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-widest ${
+        isPremium ? "bg-laranja text-marinho" : "bg-white/10 text-white"
+      }`}
+      title={isPremium ? "Plano Premium ativo" : "Plano gratuito (visitante)"}
+    >
+      {isPremium ? <Crown className="h-3.5 w-3.5" /> : <UserIcon className="h-3.5 w-3.5" />}
+      {isPremium ? "Premium" : "Visitante"}
+    </span>
+  );
+}
+
+// Keep RouterLink import used to satisfy tree-shakers if referenced elsewhere.
+void RouterLink;
