@@ -122,11 +122,8 @@ export type Database = {
           avatar_url: string | null
           course: string | null
           created_at: string
-          email: string | null
           full_name: string | null
           id: string
-          plan: string
-          premium_since: string | null
           semester: string | null
           university: string | null
           updated_at: string
@@ -135,11 +132,8 @@ export type Database = {
           avatar_url?: string | null
           course?: string | null
           created_at?: string
-          email?: string | null
           full_name?: string | null
           id: string
-          plan?: string
-          premium_since?: string | null
           semester?: string | null
           university?: string | null
           updated_at?: string
@@ -148,11 +142,8 @@ export type Database = {
           avatar_url?: string | null
           course?: string | null
           created_at?: string
-          email?: string | null
           full_name?: string | null
           id?: string
-          plan?: string
-          premium_since?: string | null
           semester?: string | null
           university?: string | null
           updated_at?: string
@@ -221,38 +212,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      activate_premium: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          avatar_url: string | null
-          course: string | null
-          created_at: string
-          email: string | null
-          full_name: string | null
-          id: string
-          plan: string
-          premium_since: string | null
-          semester: string | null
-          university: string | null
-          updated_at: string
-        }
-      }
-      grant_premium_by_email: {
-        Args: { p_email: string }
-        Returns: {
-          avatar_url: string | null
-          course: string | null
-          created_at: string
-          email: string | null
-          full_name: string | null
-          id: string
-          plan: string
-          premium_since: string | null
-          semester: string | null
-          university: string | null
-          updated_at: string
-        }
-      }
       get_leaderboard: {
         Args: { _limit?: number }
         Returns: {
