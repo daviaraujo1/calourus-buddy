@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Flame, Trophy, Target, BookOpenCheck, Sparkles, Medal, Crown, User as UserIcon } from "lucide-react";
+import { ArrowLeft, Flame, Trophy, Target, BookOpenCheck, Sparkles, Medal, Crown, User as UserIcon, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
