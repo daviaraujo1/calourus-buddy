@@ -130,6 +130,7 @@ function Perfil() {
                       <Sparkles className="h-3.5 w-3.5" /> Nível {level}
                     </span>
                     <PlanBadge plan={profile?.plan} />
+                    {isAdmin && <AdminBadge />}
                   </div>
                   <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">{displayName}</h1>
                   <p className="text-sm text-white/70">
