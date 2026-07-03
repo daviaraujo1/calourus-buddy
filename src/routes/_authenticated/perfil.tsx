@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Flame, Trophy, Target, BookOpenCheck, Sparkles, Medal, Crown, User as UserIcon } from "lucide-react";
+import { ArrowLeft, Flame, Trophy, Target, BookOpenCheck, Sparkles, Medal, Crown, User as UserIcon, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
@@ -31,6 +31,7 @@ function Perfil() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [rank, setRank] = useState<number | null>(null);
   const [email, setEmail] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,13 +40,15 @@ function Perfil() {
       if (!user) return;
       setEmail(user.email ?? "");
 
-      const [{ data: p }, { data: s }, { data: board }] = await Promise.all([
+      const [{ data: p }, { data: s }, { data: board }, { data: adminFlag }] = await Promise.all([
         supabase.from("profiles").select("full_name, course, university, avatar_url, plan").eq("id", user.id).maybeSingle(),
         supabase.from("user_stats").select("xp, level, cards_studied, correct_count, streak_days, last_study_date").eq("user_id", user.id).maybeSingle(),
         supabase.rpc("get_leaderboard", { _limit: 200 }),
+        supabase.rpc("has_role", { _user_id: user.id, _role: "admin" }),
       ]);
       setProfile(p);
       setStats(s ?? { xp: 0, level: 1, cards_studied: 0, correct_count: 0, streak_days: 0, last_study_date: null });
+      setIsAdmin(!!adminFlag);
       if (Array.isArray(board)) {
         const idx = board.findIndex((r: { user_id: string }) => r.user_id === user.id);
         setRank(idx >= 0 ? idx + 1 : null);
@@ -82,6 +85,7 @@ function Perfil() {
             <ArrowLeft className="h-4 w-4" /> Voltar ao painel
           </Link>
           <div className="flex items-center gap-2">
+            {isAdmin && <AdminBadge />}
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-widest ${
                 profile?.plan === "premium"
@@ -126,6 +130,7 @@ function Perfil() {
                       <Sparkles className="h-3.5 w-3.5" /> Nível {level}
                     </span>
                     <PlanBadge plan={profile?.plan} />
+                    {isAdmin && <AdminBadge />}
                   </div>
                   <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">{displayName}</h1>
                   <p className="text-sm text-white/70">
@@ -211,6 +216,17 @@ function PlanBadge({ plan }: { plan?: string }) {
     >
       {isPremium ? <Crown className="h-3.5 w-3.5" /> : <UserIcon className="h-3.5 w-3.5" />}
       {isPremium ? "Premium" : "Visitante"}
+    </span>
+  );
+}
+
+function AdminBadge() {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white shadow-sm ring-1 ring-red-700/40"
+      title="Administrador do site"
+    >
+      <ShieldCheck className="h-3.5 w-3.5" /> Admin
     </span>
   );
 }
