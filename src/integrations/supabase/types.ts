@@ -14,118 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      question_topics: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          slug: string
-          sort_order: number
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          slug: string
-          sort_order?: number
-          title: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          slug?: string
-          sort_order?: number
-          title?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      questions: {
-        Row: {
-          correct_option: number | null
-          created_at: string
-          explanation: string | null
-          id: string
-          options: Json | null
-          prompt: string
-          sort_order: number
-          topic_id: string
-          type: string
-          updated_at: string
-        }
-        Insert: {
-          correct_option?: number | null
-          created_at?: string
-          explanation?: string | null
-          id?: string
-          options?: Json | null
-          prompt: string
-          sort_order?: number
-          topic_id: string
-          type?: string
-          updated_at?: string
-        }
-        Update: {
-          correct_option?: number | null
-          created_at?: string
-          explanation?: string | null
-          id?: string
-          options?: Json | null
-          prompt?: string
-          sort_order?: number
-          topic_id?: string
-          type?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "questions_topic_id_fkey"
-            columns: ["topic_id"]
-            isOneToOne: false
-            referencedRelation: "question_topics"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      question_attempts: {
-        Row: {
-          answer: string | null
-          correct: boolean | null
-          created_at: string
-          id: string
-          question_id: string
-          user_id: string
-        }
-        Insert: {
-          answer?: string | null
-          correct?: boolean | null
-          created_at?: string
-          id?: string
-          question_id: string
-          user_id: string
-        }
-        Update: {
-          answer?: string | null
-          correct?: boolean | null
-          created_at?: string
-          id?: string
-          question_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "question_attempts_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       flashcard_attempts: {
         Row: {
           correct: boolean
@@ -268,6 +156,118 @@ export type Database = {
         }
         Relationships: []
       }
+      question_attempts: {
+        Row: {
+          answer: string | null
+          correct: boolean | null
+          created_at: string
+          id: string
+          question_id: string
+          user_id: string
+        }
+        Insert: {
+          answer?: string | null
+          correct?: boolean | null
+          created_at?: string
+          id?: string
+          question_id: string
+          user_id: string
+        }
+        Update: {
+          answer?: string | null
+          correct?: boolean | null
+          created_at?: string
+          id?: string
+          question_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_attempts_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_topics: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          correct_option: number | null
+          created_at: string
+          explanation: string | null
+          id: string
+          options: Json | null
+          prompt: string
+          sort_order: number
+          topic_id: string
+          type: Database["public"]["Enums"]["question_type"]
+          updated_at: string
+        }
+        Insert: {
+          correct_option?: number | null
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json | null
+          prompt: string
+          sort_order?: number
+          topic_id: string
+          type: Database["public"]["Enums"]["question_type"]
+          updated_at?: string
+        }
+        Update: {
+          correct_option?: number | null
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json | null
+          prompt?: string
+          sort_order?: number
+          topic_id?: string
+          type?: Database["public"]["Enums"]["question_type"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "questions_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "question_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -331,7 +331,7 @@ export type Database = {
     }
     Functions: {
       get_daily_question_usage: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           answered_today: number
           is_premium: boolean
@@ -359,13 +359,12 @@ export type Database = {
         Returns: boolean
       }
       list_question_topics: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           description: string
           id: string
           question_count: number
           slug: string
-          sort_order: number
           title: string
         }[]
       }
@@ -376,7 +375,7 @@ export type Database = {
           options: Json
           prompt: string
           sort_order: number
-          type: string
+          type: Database["public"]["Enums"]["question_type"]
         }[]
       }
       record_flashcard_attempt: {
@@ -403,6 +402,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "student"
+      question_type: "multiple_choice" | "essay"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -531,6 +531,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "student"],
+      question_type: ["multiple_choice", "essay"],
     },
   },
 } as const

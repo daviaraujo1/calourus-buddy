@@ -10,8 +10,11 @@ export function usePlan() {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data } = await supabase.from("profiles").select("plan").eq("id", user.id).maybeSingle();
-      setPlan(data?.plan === "premium" ? "premium" : "free");
+      const [{ data: profile }, { data: isAdmin }] = await Promise.all([
+        supabase.from("profiles").select("plan").eq("id", user.id).maybeSingle(),
+        supabase.rpc("has_role", { _user_id: user.id, _role: "admin" }),
+      ]);
+      setPlan(isAdmin || profile?.plan === "premium" ? "premium" : "free");
     })();
   }, []);
 
