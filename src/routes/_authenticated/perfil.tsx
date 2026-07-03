@@ -31,6 +31,7 @@ function Perfil() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [rank, setRank] = useState<number | null>(null);
   const [email, setEmail] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,13 +40,15 @@ function Perfil() {
       if (!user) return;
       setEmail(user.email ?? "");
 
-      const [{ data: p }, { data: s }, { data: board }] = await Promise.all([
+      const [{ data: p }, { data: s }, { data: board }, { data: adminFlag }] = await Promise.all([
         supabase.from("profiles").select("full_name, course, university, avatar_url, plan").eq("id", user.id).maybeSingle(),
         supabase.from("user_stats").select("xp, level, cards_studied, correct_count, streak_days, last_study_date").eq("user_id", user.id).maybeSingle(),
         supabase.rpc("get_leaderboard", { _limit: 200 }),
+        supabase.rpc("has_role", { _user_id: user.id, _role: "admin" }),
       ]);
       setProfile(p);
       setStats(s ?? { xp: 0, level: 1, cards_studied: 0, correct_count: 0, streak_days: 0, last_study_date: null });
+      setIsAdmin(!!adminFlag);
       if (Array.isArray(board)) {
         const idx = board.findIndex((r: { user_id: string }) => r.user_id === user.id);
         setRank(idx >= 0 ? idx + 1 : null);
