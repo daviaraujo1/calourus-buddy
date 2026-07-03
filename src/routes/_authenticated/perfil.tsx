@@ -85,6 +85,7 @@ function Perfil() {
             <ArrowLeft className="h-4 w-4" /> Voltar ao painel
           </Link>
           <div className="flex items-center gap-2">
+            {isAdmin && <AdminBadge />}
             <span
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold uppercase tracking-widest ${
                 profile?.plan === "premium"
