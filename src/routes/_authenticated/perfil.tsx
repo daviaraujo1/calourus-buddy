@@ -220,4 +220,15 @@ function PlanBadge({ plan }: { plan?: string }) {
   );
 }
 
+function AdminBadge() {
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full bg-red-600 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white shadow-sm ring-1 ring-red-700/40"
+      title="Administrador do site"
+    >
+      <ShieldCheck className="h-3.5 w-3.5" /> Admin
+    </span>
+  );
+}
+
 
