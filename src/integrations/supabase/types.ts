@@ -51,8 +51,6 @@ export type Database = {
       }
       flashcard_topics: {
         Row: {
-          area_id: string | null
-          course_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -62,8 +60,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          area_id?: string | null
-          course_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -73,8 +69,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          area_id?: string | null
-          course_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -83,22 +77,7 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "flashcard_topics_area_id_fkey"
-            columns: ["area_id"]
-            isOneToOne: false
-            referencedRelation: "subject_areas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "flashcard_topics_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       flashcards: {
         Row: {
@@ -142,7 +121,6 @@ export type Database = {
         Row: {
           avatar_url: string | null
           course: string | null
-          course_id: string | null
           created_at: string
           email: string | null
           full_name: string | null
@@ -155,7 +133,6 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           course?: string | null
-          course_id?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -168,7 +145,6 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           course?: string | null
-          course_id?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
@@ -178,15 +154,7 @@ export type Database = {
           university?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       question_attempts: {
         Row: {
@@ -223,78 +191,8 @@ export type Database = {
           },
         ]
       }
-      courses: {
-        Row: {
-          active: boolean
-          created_at: string
-          icon: string
-          id: string
-          name: string
-          slug: string
-          sort_order: number
-          tagline: string | null
-          updated_at: string
-        }
-        Insert: {
-          active?: boolean
-          created_at?: string
-          icon?: string
-          id?: string
-          name: string
-          slug: string
-          sort_order?: number
-          tagline?: string | null
-          updated_at?: string
-        }
-        Update: {
-          active?: boolean
-          created_at?: string
-          icon?: string
-          id?: string
-          name?: string
-          slug?: string
-          sort_order?: number
-          tagline?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      subject_areas: {
-        Row: {
-          course_id: string
-          created_at: string
-          id: string
-          name: string
-          sort_order: number
-        }
-        Insert: {
-          course_id: string
-          created_at?: string
-          id?: string
-          name: string
-          sort_order?: number
-        }
-        Update: {
-          course_id?: string
-          created_at?: string
-          id?: string
-          name?: string
-          sort_order?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "subject_areas_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       question_topics: {
         Row: {
-          area_id: string | null
-          course_id: string | null
           created_at: string
           description: string | null
           id: string
@@ -304,8 +202,6 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          area_id?: string | null
-          course_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -315,8 +211,6 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          area_id?: string | null
-          course_id?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -325,22 +219,7 @@ export type Database = {
           title?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "question_topics_area_id_fkey"
-            columns: ["area_id"]
-            isOneToOne: false
-            referencedRelation: "subject_areas"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "question_topics_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "courses"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       questions: {
         Row: {
@@ -479,15 +358,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      list_my_subject_areas: {
-        Args: Record<PropertyKey, never>
-        Returns: { id: string; name: string; sort_order: number }[]
-      }
       list_question_topics: {
-        Args: { _area_id?: string; _search?: string }
+        Args: never
         Returns: {
-          area_id: string | null
-          area_name: string | null
           description: string
           id: string
           question_count: number
