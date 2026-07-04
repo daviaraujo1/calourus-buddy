@@ -19,6 +19,8 @@ type Topic = {
   slug: string;
   title: string;
   description: string | null;
+  area_id: string | null;
+  subject_areas: { name: string } | null;
   card_count?: number;
 };
 
@@ -28,10 +30,23 @@ function FlashcardTopics() {
 
   useEffect(() => {
     (async () => {
-      const { data: topicsData } = await supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      let courseId: string | null = null;
+      if (user) {
+        const { data: profile } = await supabase.from("profiles").select("course_id").eq("id", user.id).maybeSingle();
+        courseId = profile?.course_id ?? null;
+      }
+
+      let query = supabase
         .from("flashcard_topics")
-        .select("id, slug, title, description")
+        .select("id, slug, title, description, area_id, subject_areas(name)")
         .order("sort_order", { ascending: true });
+
+      query = courseId
+        ? query.or(`course_id.is.null,course_id.eq.${courseId}`)
+        : query.is("course_id", null);
+
+      const { data: topicsData } = await query;
 
       if (topicsData) {
         const withCounts = await Promise.all(
@@ -92,7 +107,10 @@ function FlashcardTopics() {
                       {t.card_count} {t.card_count === 1 ? "cartão" : "cartões"}
                     </span>
                   </div>
-                  <h3 className="mt-4 font-display text-xl font-bold text-marinho">{t.title}</h3>
+                  {t.subject_areas?.name && (
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-laranja">{t.subject_areas.name}</p>
+                  )}
+                  <h3 className="mt-1 font-display text-xl font-bold text-marinho">{t.title}</h3>
                   {t.description && <p className="mt-1 text-sm text-muted-foreground">{t.description}</p>}
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-laranja">
                     Estudar <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />

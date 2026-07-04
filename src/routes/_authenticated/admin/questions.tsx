@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useCoursesAndAreas } from "@/components/use-courses-and-areas";
 import {
   Dialog,
   DialogContent,
@@ -46,6 +48,8 @@ type Topic = {
   title: string;
   description: string | null;
   sort_order: number;
+  course_id: string | null;
+  area_id: string | null;
   questionCount: number;
 };
 
@@ -61,6 +65,9 @@ type Question = {
   explanation: string | null;
   sort_order: number;
 };
+
+const NO_COURSE = "__none__";
+const NO_AREA = "__none__";
 
 function slugify(title: string) {
   return title
@@ -81,7 +88,7 @@ function AdminQuestionsPage() {
   async function loadTopics(keepSelection = true) {
     const { data, error } = await supabase
       .from("question_topics")
-      .select("id, slug, title, description, sort_order, questions(count)")
+      .select("id, slug, title, description, sort_order, course_id, area_id, questions(count)")
       .order("sort_order", { ascending: true });
 
     if (error) {
@@ -95,6 +102,8 @@ function AdminQuestionsPage() {
       title: t.title,
       description: t.description,
       sort_order: t.sort_order,
+      course_id: t.course_id,
+      area_id: t.area_id,
       questionCount: (t.questions as unknown as { count: number }[])?.[0]?.count ?? 0,
     }));
     setTopics(mapped);
@@ -327,12 +336,18 @@ function TopicFormDialog({
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState(topic?.title ?? "");
   const [description, setDescription] = useState(topic?.description ?? "");
+  const [courseId, setCourseId] = useState<string>(topic?.course_id ?? NO_COURSE);
+  const [areaId, setAreaId] = useState<string>(topic?.area_id ?? NO_AREA);
   const [saving, setSaving] = useState(false);
+  const { courses, areas } = useCoursesAndAreas();
+  const areasForCourse = areas.filter((a) => a.course_id === courseId);
 
   useEffect(() => {
     if (open) {
       setTitle(topic?.title ?? "");
       setDescription(topic?.description ?? "");
+      setCourseId(topic?.course_id ?? NO_COURSE);
+      setAreaId(topic?.area_id ?? NO_AREA);
     }
   }, [open, topic]);
 
@@ -343,10 +358,14 @@ function TopicFormDialog({
     }
     setSaving(true);
     try {
+      const courseAreaPayload = {
+        course_id: courseId === NO_COURSE ? null : courseId,
+        area_id: areaId === NO_AREA ? null : areaId,
+      };
       if (topic) {
         const { error } = await supabase
           .from("question_topics")
-          .update({ title: title.trim(), description: description.trim() || null })
+          .update({ title: title.trim(), description: description.trim() || null, ...courseAreaPayload })
           .eq("id", topic.id);
         if (error) throw error;
         toast.success("Tópico atualizado.");
@@ -372,6 +391,7 @@ function TopicFormDialog({
           title: title.trim(),
           description: description.trim() || null,
           sort_order: count ?? 0,
+          ...courseAreaPayload,
         });
         if (error) throw error;
         toast.success("Tópico criado.");
@@ -409,6 +429,40 @@ function TopicFormDialog({
               placeholder="Uma linha explicando o que o tópico cobre"
               rows={2}
             />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-1.5">
+              <Label>Curso (opcional)</Label>
+              <Select value={courseId} onValueChange={(v) => { setCourseId(v); setAreaId(NO_AREA); }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Geral (todos os cursos)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_COURSE}>Geral (todos os cursos)</SelectItem>
+                  {courses.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Área (opcional)</Label>
+              <Select value={areaId} onValueChange={setAreaId} disabled={courseId === NO_COURSE}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sem área" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_AREA}>Sem área</SelectItem>
+                  {areasForCourse.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
         <DialogFooter>

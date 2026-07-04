@@ -1,16 +1,24 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, ArrowRight, FileQuestion, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileQuestion, Search, Sparkles, GraduationCap } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/_authenticated/questoes/")({
   head: () => ({
     meta: [
       { title: "Banco de Questões — Calourus" },
-      { name: "description", content: "Pratique com questões organizadas por tópicos." },
+      { name: "description", content: "Pratique com questões organizadas por disciplina." },
     ],
   }),
-  component: QuestionTopics,
+  component: QuestionSearch,
 });
 
 type Topic = {
@@ -18,28 +26,66 @@ type Topic = {
   slug: string;
   title: string;
   description: string | null;
+  area_id: string | null;
+  area_name: string | null;
   question_count: number;
 };
 
+type Area = { id: string; name: string; sort_order: number };
 type Usage = { answered_today: number; remaining: number; is_premium: boolean };
 
-function QuestionTopics() {
+const ALL_AREAS = "__all__";
+
+function QuestionSearch() {
   const navigate = useNavigate();
+  const [hasCourse, setHasCourse] = useState<boolean | null>(null);
+  const [areas, setAreas] = useState<Area[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [usage, setUsage] = useState<Usage | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedArea, setSelectedArea] = useState<string>(ALL_AREAS);
+  const [search, setSearch] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
 
   useEffect(() => {
     (async () => {
-      const [{ data: topicsData }, { data: usageData }] = await Promise.all([
-        supabase.rpc("list_question_topics"),
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase.from("profiles").select("course_id").eq("id", user.id).maybeSingle();
+      setHasCourse(!!profile?.course_id);
+
+      const [{ data: areasData }, { data: usageData }] = await Promise.all([
+        supabase.rpc("list_my_subject_areas"),
         supabase.rpc("get_daily_question_usage"),
       ]);
-      if (topicsData) setTopics(topicsData);
+      setAreas(areasData ?? []);
       if (usageData && usageData.length > 0) setUsage(usageData[0]);
+      await fetchTopics(null, "");
       setLoading(false);
     })();
   }, []);
+
+  async function fetchTopics(areaId: string | null, query: string) {
+    const { data } = await supabase.rpc("list_question_topics", {
+      _area_id: areaId ?? undefined,
+      _search: query || undefined,
+    });
+    setTopics(data ?? []);
+  }
+
+  async function handleSearch() {
+    setLoading(true);
+    setAppliedSearch(search);
+    await fetchTopics(selectedArea === ALL_AREAS ? null : selectedArea, search);
+    setLoading(false);
+  }
+
+  async function handleAreaChange(value: string) {
+    setSelectedArea(value);
+    setLoading(true);
+    await fetchTopics(value === ALL_AREAS ? null : value, appliedSearch);
+    setLoading(false);
+  }
 
   const outOfQuestions = usage && !usage.is_premium && usage.remaining <= 0;
 
@@ -54,20 +100,64 @@ function QuestionTopics() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-6 py-12">
-        <div className="rounded-3xl bg-gradient-to-br from-marinho to-marinho-soft p-10 text-primary-foreground shadow-[var(--shadow-elegant)]">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase tracking-widest">
-            <FileQuestion className="h-3.5 w-3.5" /> Pratique por tópicos
-          </span>
-          <h1 className="mt-4 font-display text-4xl font-bold sm:text-5xl">Escolha um tópico</h1>
-          <p className="mt-2 max-w-lg text-white/80">
-            Questões de múltipla escolha e dissertativas elaboradas pela equipe Calourus.
-          </p>
+      <main className="mx-auto max-w-5xl px-6 py-10">
+        <h1 className="font-display text-3xl font-bold text-marinho">Buscar questões</h1>
+        <p className="mt-1 text-muted-foreground">Pratique com questões organizadas pela sua disciplina.</p>
+
+        {hasCourse === false && (
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-laranja bg-laranja-soft p-5">
+            <p className="flex items-center gap-2 text-sm font-medium text-marinho">
+              <GraduationCap className="h-4 w-4" /> Escolha seu curso para ver as disciplinas certas para você.
+            </p>
+            <button
+              onClick={() => navigate({ to: "/curso" })}
+              className="rounded-full bg-marinho px-4 py-2 text-xs font-semibold text-primary-foreground"
+            >
+              Escolher curso
+            </button>
+          </div>
+        )}
+
+        {/* Search card, styled after the reference screenshot */}
+        <div className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-elegant)]">
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="sm:w-64">
+              <Select value={selectedArea} onValueChange={handleAreaChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a disciplina" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL_AREAS}>Todas as disciplinas</SelectItem>
+                  {areas.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                placeholder="Digite um trecho do tópico"
+                className="pl-9"
+              />
+            </div>
+            <button
+              onClick={handleSearch}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-laranja px-6 py-2 text-sm font-semibold text-marinho shadow-[var(--shadow-glow)] transition hover:brightness-105"
+            >
+              <Search className="h-4 w-4" /> Buscar questões
+            </button>
+          </div>
         </div>
 
         {usage && (
           <div
-            className={`mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 ${
+            className={`mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 ${
               usage.is_premium
                 ? "border-laranja/30 bg-laranja-soft/40"
                 : outOfQuestions
@@ -106,7 +196,14 @@ function QuestionTopics() {
           {loading ? (
             <p className="text-muted-foreground">Carregando tópicos…</p>
           ) : topics.length === 0 ? (
-            <p className="text-muted-foreground">Nenhum tópico disponível ainda.</p>
+            <div className="rounded-2xl border border-dashed border-border p-10 text-center">
+              <FileQuestion className="mx-auto h-8 w-8 text-muted-foreground/60" />
+              <p className="mt-3 text-muted-foreground">
+                {appliedSearch || selectedArea !== ALL_AREAS
+                  ? "Nenhum tópico encontrado para esse filtro."
+                  : "Nenhum tópico disponível ainda."}
+              </p>
+            </div>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {topics.map((t) => (
@@ -124,7 +221,10 @@ function QuestionTopics() {
                       {t.question_count} {t.question_count === 1 ? "questão" : "questões"}
                     </span>
                   </div>
-                  <h3 className="mt-4 font-display text-xl font-bold text-marinho">{t.title}</h3>
+                  {t.area_name && (
+                    <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-laranja">{t.area_name}</p>
+                  )}
+                  <h3 className="mt-1 font-display text-lg font-bold text-marinho">{t.title}</h3>
                   {t.description && <p className="mt-1 text-sm text-muted-foreground">{t.description}</p>}
                   <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-laranja">
                     Praticar <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
