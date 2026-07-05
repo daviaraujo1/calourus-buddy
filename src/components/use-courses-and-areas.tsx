@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type CourseOption = { id: string; name: string; active: boolean };
-export type AreaOption = { id: string; course_id: string; name: string };
+export type AreaOption = { id: string; course_id: string | null; name: string };
 
 export function useCoursesAndAreas() {
   const [courses, setCourses] = useState<CourseOption[]>([]);

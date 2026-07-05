@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, ArrowRight, FileQuestion, Search, Sparkles, GraduationCap } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileQuestion, Search, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -38,7 +38,6 @@ const ALL_AREAS = "__all__";
 
 function QuestionSearch() {
   const navigate = useNavigate();
-  const [hasCourse, setHasCourse] = useState<boolean | null>(null);
   const [areas, setAreas] = useState<Area[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [usage, setUsage] = useState<Usage | null>(null);
@@ -51,8 +50,6 @@ function QuestionSearch() {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data: profile } = await supabase.from("profiles").select("course_id").eq("id", user.id).maybeSingle();
-      setHasCourse(!!profile?.course_id);
 
       const [{ data: areasData }, { data: usageData }] = await Promise.all([
         supabase.rpc("list_my_subject_areas"),
@@ -103,20 +100,6 @@ function QuestionSearch() {
       <main className="mx-auto max-w-5xl px-6 py-10">
         <h1 className="font-display text-3xl font-bold text-marinho">Buscar questões</h1>
         <p className="mt-1 text-muted-foreground">Pratique com questões organizadas pela sua disciplina.</p>
-
-        {hasCourse === false && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-laranja bg-laranja-soft p-5">
-            <p className="flex items-center gap-2 text-sm font-medium text-marinho">
-              <GraduationCap className="h-4 w-4" /> Escolha seu curso para ver as disciplinas certas para você.
-            </p>
-            <button
-              onClick={() => navigate({ to: "/curso" })}
-              className="rounded-full bg-marinho px-4 py-2 text-xs font-semibold text-primary-foreground"
-            >
-              Escolher curso
-            </button>
-          </div>
-        )}
 
         {/* Search card, styled after the reference screenshot */}
         <div className="mt-6 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-elegant)]">

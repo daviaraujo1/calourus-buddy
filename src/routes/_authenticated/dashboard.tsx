@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Layers, FileQuestion, UserCheck, LogOut, Sparkles, ArrowRight, Trophy, User, Flame, Crown, Lock, GraduationCap } from "lucide-react";
+import { BookOpen, Layers, FileQuestion, UserCheck, LogOut, Sparkles, ArrowRight, Trophy, User, Flame, Crown, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
@@ -147,14 +147,6 @@ function Dashboard() {
                     Assinar Premium · R$ 39,99/mês
                   </Link>
                 )}
-                {profile && !profile.course_id && (
-                  <Link
-                    to="/curso"
-                    className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
-                  >
-                    <GraduationCap className="h-4 w-4" /> Escolher meu curso
-                  </Link>
-                )}
               </div>
             </div>
             <Link
@@ -184,28 +176,6 @@ function Dashboard() {
             </Link>
           </div>
         </div>
-
-        {profile && !profile.course_id && (
-          <Link
-            to="/curso"
-            className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border-2 border-laranja bg-laranja-soft p-6 transition hover:brightness-[1.02]"
-          >
-            <div className="flex items-center gap-4">
-              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-marinho text-primary-foreground">
-                <GraduationCap className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="font-display text-lg font-bold text-marinho">Escolha seu curso</p>
-                <p className="text-sm text-marinho/80">
-                  Flashcards, banco de questões e materiais vão se ajustar automaticamente.
-                </p>
-              </div>
-            </div>
-            <span className="inline-flex items-center gap-1 whitespace-nowrap text-sm font-semibold text-marinho">
-              Escolher agora <ArrowRight className="h-4 w-4" />
-            </span>
-          </Link>
-        )}
 
         <section className="mt-10">
           <h2 className="font-display text-2xl font-bold text-marinho">Acesso rápido</h2>

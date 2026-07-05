@@ -340,7 +340,7 @@ function TopicFormDialog({
   const [areaId, setAreaId] = useState<string>(topic?.area_id ?? NO_AREA);
   const [saving, setSaving] = useState(false);
   const { courses, areas } = useCoursesAndAreas();
-  const areasForCourse = areas.filter((a) => a.course_id === courseId);
+  const areasForCourse = areas.filter((a) => a.course_id === null || a.course_id === courseId);
 
   useEffect(() => {
     if (open) {
@@ -449,7 +449,7 @@ function TopicFormDialog({
             </div>
             <div className="grid gap-1.5">
               <Label>Área (opcional)</Label>
-              <Select value={areaId} onValueChange={setAreaId} disabled={courseId === NO_COURSE}>
+              <Select value={areaId} onValueChange={setAreaId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sem área" />
                 </SelectTrigger>
