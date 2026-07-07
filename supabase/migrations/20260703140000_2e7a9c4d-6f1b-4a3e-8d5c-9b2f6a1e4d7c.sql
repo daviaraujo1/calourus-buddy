@@ -16,6 +16,8 @@ with check (public.has_role(auth.uid(), 'admin'));
 
 -- Back to SECURITY DEFINER so students can read the safe columns even
 -- though the base table itself has no policy allowing them to.
+drop function if exists public.list_question_topics();
+
 create or replace function public.list_question_topics()
 returns table (
   id uuid,

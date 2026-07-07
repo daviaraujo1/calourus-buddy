@@ -1,4 +1,13 @@
 
+-- NOTE: this migration came from a parallel branch that independently
+-- rebuilt the question bank (see migration 20260702030000, applied
+-- earlier in this history). Several policy/function names collide with
+-- that earlier migration — the DROP ... IF EXISTS statements below make
+-- this safe to (re)apply on top of it instead of erroring on "already
+-- exists". Its temporary security regression (a public read policy on
+-- `questions`, plus SECURITY INVOKER variants) is corrected by migration
+-- 20260703140000, which runs right after this one.
+
 -- Enum for question type
 DO $$ BEGIN
   CREATE TYPE public.question_type AS ENUM ('multiple_choice','essay');
@@ -17,8 +26,10 @@ CREATE TABLE IF NOT EXISTS public.question_topics (
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.question_topics TO authenticated;
 GRANT ALL ON public.question_topics TO service_role;
 ALTER TABLE public.question_topics ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Authenticated can view question topics" ON public.question_topics;
 CREATE POLICY "Authenticated can view question topics" ON public.question_topics
   FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Admins manage question topics" ON public.question_topics;
 CREATE POLICY "Admins manage question topics" ON public.question_topics
   FOR ALL TO authenticated
   USING (public.has_role(auth.uid(),'admin'))
@@ -40,8 +51,13 @@ CREATE TABLE IF NOT EXISTS public.questions (
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.questions TO authenticated;
 GRANT ALL ON public.questions TO service_role;
 ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
+-- NOTE: this policy is intentionally leaky (any authenticated user could
+-- read the gabarito) and is dropped again by migration 20260703140000.
+-- Kept here only for historical accuracy of what this branch introduced.
+DROP POLICY IF EXISTS "Authenticated can view questions" ON public.questions;
 CREATE POLICY "Authenticated can view questions" ON public.questions
   FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Admins manage questions" ON public.questions;
 CREATE POLICY "Admins manage questions" ON public.questions
   FOR ALL TO authenticated
   USING (public.has_role(auth.uid(),'admin'))
@@ -59,6 +75,7 @@ CREATE TABLE IF NOT EXISTS public.question_attempts (
 GRANT SELECT, INSERT ON public.question_attempts TO authenticated;
 GRANT ALL ON public.question_attempts TO service_role;
 ALTER TABLE public.question_attempts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users view own question attempts" ON public.question_attempts;
 CREATE POLICY "Users view own question attempts" ON public.question_attempts
   FOR SELECT TO authenticated USING (auth.uid() = user_id);
 
@@ -70,7 +87,9 @@ DROP TRIGGER IF EXISTS trg_questions_updated ON public.questions;
 CREATE TRIGGER trg_questions_updated BEFORE UPDATE ON public.questions
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
--- RPC: list_question_topics
+-- RPC: list_question_topics (different column shape than the earlier
+-- migration's version — drop first so CREATE OR REPLACE doesn't error).
+DROP FUNCTION IF EXISTS public.list_question_topics();
 CREATE OR REPLACE FUNCTION public.list_question_topics()
 RETURNS TABLE(id uuid, slug text, title text, description text, question_count bigint)
 LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public AS $$
@@ -81,7 +100,9 @@ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public AS $$
 $$;
 GRANT EXECUTE ON FUNCTION public.list_question_topics() TO authenticated;
 
--- RPC: list_topic_questions
+-- RPC: list_topic_questions (type column is text upstream, enum here —
+-- different OUT signature, so drop first).
+DROP FUNCTION IF EXISTS public.list_topic_questions(uuid);
 CREATE OR REPLACE FUNCTION public.list_topic_questions(_topic_id uuid)
 RETURNS TABLE(id uuid, type public.question_type, prompt text, options jsonb, sort_order integer)
 LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public AS $$
@@ -92,7 +113,8 @@ LANGUAGE sql STABLE SECURITY INVOKER SET search_path = public AS $$
 $$;
 GRANT EXECUTE ON FUNCTION public.list_topic_questions(uuid) TO authenticated;
 
--- RPC: get_daily_question_usage
+-- RPC: get_daily_question_usage (same column shape as upstream — plain
+-- CREATE OR REPLACE is fine here).
 CREATE OR REPLACE FUNCTION public.get_daily_question_usage()
 RETURNS TABLE(answered_today integer, remaining integer, is_premium boolean)
 LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
@@ -116,7 +138,9 @@ BEGIN
 END $$;
 GRANT EXECUTE ON FUNCTION public.get_daily_question_usage() TO authenticated;
 
--- RPC: record_question_attempt
+-- RPC: record_question_attempt (column order differs from upstream's
+-- version — drop first so CREATE OR REPLACE doesn't error).
+DROP FUNCTION IF EXISTS public.record_question_attempt(uuid, text);
 CREATE OR REPLACE FUNCTION public.record_question_attempt(_question_id uuid, _answer text)
 RETURNS TABLE(correct boolean, correct_option integer, explanation text, is_premium boolean, remaining_today integer)
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
