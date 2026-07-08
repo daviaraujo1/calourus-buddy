@@ -320,7 +320,7 @@ export type Database = {
           prompt: string
           sort_order: number
           topic_id: string
-          type: string
+          type: Database["public"]["Enums"]["question_type"]
           updated_at: string
         }
         Insert: {
@@ -332,7 +332,7 @@ export type Database = {
           prompt: string
           sort_order?: number
           topic_id: string
-          type?: string
+          type: Database["public"]["Enums"]["question_type"]
           updated_at?: string
         }
         Update: {
@@ -344,7 +344,7 @@ export type Database = {
           prompt?: string
           sort_order?: number
           topic_id?: string
-          type?: string
+          type?: Database["public"]["Enums"]["question_type"]
           updated_at?: string
         }
         Relationships: [
@@ -452,7 +452,7 @@ export type Database = {
     }
     Functions: {
       get_daily_question_usage: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           answered_today: number
           is_premium: boolean
@@ -480,7 +480,7 @@ export type Database = {
         Returns: boolean
       }
       list_my_subject_areas: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           id: string
           name: string
@@ -506,7 +506,7 @@ export type Database = {
           options: Json
           prompt: string
           sort_order: number
-          type: string
+          type: Database["public"]["Enums"]["question_type"]
         }[]
       }
       record_flashcard_attempt: {
@@ -534,6 +534,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "student"
+      question_type: "multiple_choice" | "essay"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -662,6 +663,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "student"],
+      question_type: ["multiple_choice", "essay"],
     },
   },
 } as const
