@@ -80,8 +80,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Calourus — Bem-vindo à Vida Acadêmica" },
-      { name: "description", content: "Plataforma que guia novos universitários: materiais, dicas, videoaulas, banco de questões e monitores." },
+      { title: "Calourus - Prática para concursos públicos" },
+      { name: "description", content: "Plataforma de treino jurídico com questões, simulados, revisões e trilhas para concursos públicos." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
