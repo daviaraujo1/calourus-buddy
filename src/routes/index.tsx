@@ -22,6 +22,8 @@ import {
   Sparkles,
   Target,
   Timer,
+  Trophy,
+  User,
   type LucideIcon,
 } from "lucide-react";
 
@@ -98,6 +100,18 @@ const featureCards: Feature[] = [
     icon: MessageCircle,
     title: "Chat com IA para discussão de questões",
     desc: "Discuta questões, alternativas e fundamentos jurídicos com apoio inteligente.",
+  },
+  {
+    icon: User,
+    title: "Perfil e conquistas",
+    desc: "Acompanhe XP, nível e sequência de estudo com tags de progresso no seu perfil.",
+    to: "/perfil",
+  },
+  {
+    icon: Trophy,
+    title: "Ranking",
+    desc: "Compare sua evolução com a de outros estudantes na plataforma.",
+    to: "/ranking",
   },
 ];
 
@@ -643,6 +657,23 @@ function Performance() {
               </span>
             ))}
           </div>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              to="/perfil"
+              className="inline-flex h-11 items-center gap-2 rounded-[8px] bg-marinho px-4 text-sm font-bold text-primary-foreground transition hover:bg-marinho-soft"
+            >
+              <User className="h-4 w-4" />
+              Ver meu perfil
+            </Link>
+            <Link
+              to="/ranking"
+              className="inline-flex h-11 items-center gap-2 rounded-[8px] border border-border px-4 text-sm font-bold text-marinho transition hover:bg-secondary"
+            >
+              <Trophy className="h-4 w-4" />
+              Ver ranking
+            </Link>
+          </div>
         </div>
 
         <div className="relative min-h-[560px]">
@@ -962,6 +993,22 @@ function Footer() {
           />
           <span className="font-display text-lg font-bold text-marinho">Calourus</span>
         </div>
+
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-semibold text-muted-foreground">
+          <Link to="/auth" className="transition hover:text-marinho">
+            Entrar
+          </Link>
+          <Link to="/perfil" className="transition hover:text-marinho">
+            Perfil
+          </Link>
+          <Link to="/ranking" className="transition hover:text-marinho">
+            Ranking
+          </Link>
+          <Link to="/admin" className="transition hover:text-marinho">
+            Painel administrativo
+          </Link>
+        </nav>
+
         <p className="text-sm text-muted-foreground">
           © 2026 Calourus. Treino jurídico para concursos públicos.
         </p>
